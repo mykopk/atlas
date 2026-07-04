@@ -1,6 +1,11 @@
 <p align="center">
-  <h1 align="center">@myko/atlas-client</h1>
+  <h1 align="center">@myko/atlas</h1>
   <p align="center">Universal database abstraction layer for the MYKO ecosystem.</p>
+  <p align="center">
+    <a href="https://www.npmjs.com/package/@myko/atlas"><img src="https://img.shields.io/npm/v/@myko/atlas" alt="npm version"></a>
+    <a href="https://www.npmjs.com/package/@myko/atlas"><img src="https://img.shields.io/npm/dm/@myko/atlas" alt="npm downloads"></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@myko/atlas" alt="license"></a>
+  </p>
 </p>
 
 ---
@@ -8,7 +13,7 @@
 One API to query them all. Drizzle ORM, Prisma, raw SQL, Supabase, or in-memory mock — with pluggable extensions for caching, encryption, soft-delete, audit, read replicas, and multi-region writes.
 
 ```typescript
-import { createDatabaseService } from "@myko/atlas-client";
+import { createDatabaseService } from "@myko/atlas";
 
 const db = await createDatabaseService({
   adapter: "drizzle",
@@ -64,7 +69,7 @@ npm install @myko/atlas-client
 ```
 
 ```typescript
-import { createDatabaseService } from "@myko/atlas-client";
+import { createDatabaseService } from "@myko/atlas";
 
 const db = await createDatabaseService({
   adapter: "drizzle",
@@ -120,7 +125,7 @@ npm install ioredis
 Two modes: **typed ORM** with registered `PgTable` objects, or **raw SQL** fallback.
 
 ```typescript
-import { createDatabaseService } from "@myko/atlas-client";
+import { createDatabaseService } from "@myko/atlas";
 import { pgTable, uuid, text } from "drizzle-orm/pg-core";
 
 const users = pgTable("users", {
@@ -500,20 +505,11 @@ Currently Node.js only. Edge support is on the roadmap.
 
 ## License
 
-```
-UNLICENSED — Proprietary
-Copyright © 2026 MYKO Pakistan. All rights reserved.
-```
+MIT License — Copyright © 2026 MYKO Pakistan
 
-This software is the **exclusive property** of MYKO Pakistan. It is not open-source and not free software.
-
-**You may NOT:**
-- Copy, modify, or distribute this code
-- Use it in part or whole for any purpose
-- Reverse engineer, decompile, or extract its logic
-- Incorporate it into any other project
-
-This code is provided for **internal company use only**. All rights are reserved under applicable copyright and intellectual property laws.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software to use, copy, modify, merge, publish, distribute, sublicense,
+and sell copies. See [`LICENSE`](./LICENSE) for full terms.
 
 ---
 
