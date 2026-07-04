@@ -3,39 +3,8 @@
   "version": "2.0.0",
   "description": "Universal secure database abstraction layer for the MYKO ecosystem — Drizzle, Prisma, SQL, Supabase, Mock with pluggable extensions",
   "type": "module",
-  "license": "MIT",
-  "author": "MYKO Labs",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mykolabs/atlas-client.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mykolabs/atlas-client/issues"
-  },
-  "homepage": "https://github.com/mykolabs/atlas-client#readme",
-  "keywords": [
-    "database",
-    "orm",
-    "drizzle",
-    "prisma",
-    "postgresql",
-    "supabase",
-    "abstraction",
-    "layer",
-    "adapter",
-    "nestjs",
-    "typescript",
-    "caching",
-    "encryption",
-    "soft-delete",
-    "audit",
-    "sharding",
-    "multi-tenancy"
-  ],
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "sideEffects": false,
+  "license": "UNLICENSED",
+  "author": "MYKO Pakistan",
   "exports": {
     ".": {
       "import": {
@@ -51,21 +20,13 @@
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "CHANGELOG.md"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
+  "private": true,
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "prepublishOnly": "npm run build",
-    "prepack": "npm run build"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@myko/config": "^1.0.0",

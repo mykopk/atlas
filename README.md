@@ -1,11 +1,6 @@
 <p align="center">
   <h1 align="center">@myko/atlas-client</h1>
   <p align="center">Universal database abstraction layer for the MYKO ecosystem.</p>
-  <p align="center">
-    <a href="https://www.npmjs.com/package/@myko/atlas-client"><img src="https://img.shields.io/npm/v/@myko/atlas-client" alt="npm version"></a>
-    <a href="https://www.npmjs.com/package/@myko/atlas-client"><img src="https://img.shields.io/npm/dm/@myko/atlas-client" alt="npm downloads"></a>
-    <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@myko/atlas-client" alt="license"></a>
-  </p>
 </p>
 
 ---
@@ -505,31 +500,33 @@ Currently Node.js only. Edge support is on the roadmap.
 
 ## License
 
-Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more information.
+```
+UNLICENSED — Proprietary
+Copyright © 2026 MYKO Pakistan. All rights reserved.
+```
+
+This software is the **exclusive property** of MYKO Pakistan. It is not open-source and not free software.
+
+**You may NOT:**
+- Copy, modify, or distribute this code
+- Use it in part or whole for any purpose
+- Reverse engineer, decompile, or extract its logic
+- Incorporate it into any other project
+
+This code is provided for **internal company use only**. All rights are reserved under applicable copyright and intellectual property laws.
 
 ---
 
-## Acknowledgments
+## Company
 
-- [Drizzle ORM](https://orm.drizzle.team) — TypeScript SQL ORM
-- [Prisma](https://www.prisma.io) — Next-generation ORM
-- [Supabase](https://supabase.com) — Open source Firebase alternative
-- [NestJS](https://nestjs.com) — Progressive Node.js framework
-- [tsup](https://tsup.egoist.dev) — TypeScript bundler
-- [Vitest](https://vitest.dev) — Unit test framework
+**MYKO Pakistan**
 
----
-
-## Support
-
-- **Issues** — [GitHub Issues](https://github.com/mykolabs/atlas-client/issues)
-- **Discussions** — [GitHub Discussions](https://github.com/mykolabs/atlas-client/discussions)
-- **Changelog** — See [`CHANGELOG.md`](./CHANGELOG.md) for release notes
+| Detail | Information |
+|--------|-------------|
+| **Website** | [myko.pk](https://myko.pk) |
+| **Email** | [support@myko.pk](mailto:support@myko.pk) |
+| **About** | Building digital infrastructure and super-app experiences for millions of users across Pakistan. |
 
 ---
 
-<p align="center">
-  <sub>Built with care by MYKO Labs</sub>
-  <br>
-  <a href="#-mykoatlas-client">Back to top</a>
-</p>
+<p align="center">Built with ❤️ in Pakistan 🇵🇰</p>
