@@ -1,0 +1,79 @@
+{
+  "name": "@myko/atlas-client",
+  "version": "2.0.0",
+  "description": "Universal secure database connection provider for all MYKO services",
+  "type": "module",
+  "license": "MIT",
+  "author": "MYKO Labs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mykolabs/atlas-client.git"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@myko/config": "*",
+    "@myko/errors": "*",
+    "@myko/logger": "*",
+    "@myko/types": "*",
+    "@supabase/supabase-js": "^2.49.4",
+    "drizzle-orm": "^0.44.6",
+    "pg": "^8.13.3",
+    "pino": "^9.6.0",
+    "sanitize-html": "^2.17.5",
+    "zod": "^4.4.3"
+  },
+  "peerDependencies": {
+    "@nestjs/common": ">=10.0.0",
+    "@prisma/client": ">=5.0.0",
+    "ioredis": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": {
+      "optional": true
+    },
+    "@prisma/client": {
+      "optional": true
+    },
+    "ioredis": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@types/node": "^22.19.17",
+    "@types/pg": "^8.11.11",
+    "@types/sanitize-html": "^2.16.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.9"
+  }
+}

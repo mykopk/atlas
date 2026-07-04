@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@myko/types/db": ["../types/dist/db/index.d.ts"],
+      "@myko/types/errors": ["../errors/dist/index.d.ts"],
+      "@myko/errors": ["../errors/dist/index.d.ts"],
+      "@myko/logger": ["../logger/dist/index.d.ts"],
+      "@myko/config": ["../config/dist/index.d.ts"],
+      "@myko/config/db": ["../config/dist/db/index.d.ts"],
+      "@myko/types": ["../types/dist/index.d.ts"],
+      "@utils/*": ["src/utils/*"],
+      "@adapters/*": ["src/adapters/*"],
+      "@service/*": ["src/service/*"],
+      "@extensions/*": ["src/extensions/*"],
+      "@advanced/*": ["src/advanced/*"],
+      "@repository/*": ["src/repository/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
