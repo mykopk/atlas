@@ -419,15 +419,15 @@ if (result.success) {
 
 ```text
 ┌─────────────────────────────────────────────┐
-│           Your Application / NestJS          │
+│           Your Application / NestJS         │
 ├─────────────────────────────────────────────┤
-│              BaseRepository<T>               │
+│              BaseRepository<T>              │
 ├─────────────────────────────────────────────┤
-│              DatabaseService                 │
+│              DatabaseService                │
 ├─────────────────────────────────────────────┤
 │  Extensions (Encrypt → Cache → Audit …)     │
 ├─────────────────────────────────────────────┤
-│  Drizzle │ Prisma │ SQL │ Supabase │ Mock    │
+│  Drizzle │ Prisma │ SQL │ Supabase │ Mock   │
 ├─────────────────────────────────────────────┤
 │      pg │ @prisma/client │ supabase-js      │
 └─────────────────────────────────────────────┘
@@ -505,4 +505,37 @@ Currently Node.js only. Edge support is on the roadmap.
 
 ## License
 
-MIT — MYKO Labs
+Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more information.
+
+---
+
+## Acknowledgments
+
+- [Drizzle ORM](https://orm.drizzle.team) — TypeScript SQL ORM
+- [Prisma](https://www.prisma.io) — Next-generation ORM
+- [Supabase](https://supabase.com) — Open source Firebase alternative
+- [NestJS](https://nestjs.com) — Progressive Node.js framework
+- [tsup](https://tsup.egoist.dev) — TypeScript bundler
+- [Vitest](https://vitest.dev) — Unit test framework
+
+---
+
+## Support
+
+- **Issues** — [GitHub Issues](https://github.com/mykolabs/atlas-client/issues)
+- **Discussions** — [GitHub Discussions](https://github.com/mykolabs/atlas-client/discussions)
+- **Changelog** — See [`CHANGELOG.md`](./CHANGELOG.md) for release notes
+
+---
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@myko/atlas-client"><img src="https://img.shields.io/npm/v/@myko/atlas-client" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@myko/atlas-client"><img src="https://img.shields.io/npm/dm/@myko/atlas-client" alt="npm downloads"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@myko/atlas-client" alt="license"></a>
+  <br>
+  <sub>Built with care by MYKO Labs</sub>
+</p>
+
+<p align="center">
+  <a href="#-mykoatlas-client">Back to top</a>
+</p>
