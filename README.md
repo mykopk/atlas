@@ -529,13 +529,7 @@ Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more informati
 ---
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@myko/atlas-client"><img src="https://img.shields.io/npm/v/@myko/atlas-client" alt="npm version"></a>
-  <a href="https://www.npmjs.com/package/@myko/atlas-client"><img src="https://img.shields.io/npm/dm/@myko/atlas-client" alt="npm downloads"></a>
-  <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@myko/atlas-client" alt="license"></a>
-  <br>
   <sub>Built with care by MYKO Labs</sub>
-</p>
-
-<p align="center">
+  <br>
   <a href="#-mykoatlas-client">Back to top</a>
 </p>
