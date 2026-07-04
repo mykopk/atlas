@@ -1,7 +1,7 @@
 {
   "name": "@myko/atlas-client",
   "version": "2.0.0",
-  "description": "Universal secure database connection provider for all MYKO services",
+  "description": "Universal secure database abstraction layer for the MYKO ecosystem — Drizzle, Prisma, SQL, Supabase, Mock with pluggable extensions",
   "type": "module",
   "license": "MIT",
   "author": "MYKO Labs",
@@ -9,6 +9,33 @@
     "type": "git",
     "url": "git+https://github.com/mykolabs/atlas-client.git"
   },
+  "bugs": {
+    "url": "https://github.com/mykolabs/atlas-client/issues"
+  },
+  "homepage": "https://github.com/mykolabs/atlas-client#readme",
+  "keywords": [
+    "database",
+    "orm",
+    "drizzle",
+    "prisma",
+    "postgresql",
+    "supabase",
+    "abstraction",
+    "layer",
+    "adapter",
+    "nestjs",
+    "typescript",
+    "caching",
+    "encryption",
+    "soft-delete",
+    "audit",
+    "sharding",
+    "multi-tenancy"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "sideEffects": false,
   "exports": {
     ".": {
       "import": {
