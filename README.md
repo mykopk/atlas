@@ -1,53 +1,72 @@
-# @myko/atlas-client
+<p align="center">
+  <h1 align="center">@myko/atlas-client</h1>
+  <p align="center">Universal database abstraction layer for the MYKO ecosystem.</p>
+  <p align="center">
+    <a href="https://www.npmjs.com/package/@myko/atlas-client"><img src="https://img.shields.io/npm/v/@myko/atlas-client" alt="npm version"></a>
+    <a href="https://www.npmjs.com/package/@myko/atlas-client"><img src="https://img.shields.io/npm/dm/@myko/atlas-client" alt="npm downloads"></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@myko/atlas-client" alt="license"></a>
+  </p>
+</p>
 
-Universal database abstraction layer for the MYKO ecosystem. Provides a unified API over Drizzle ORM, Prisma, raw SQL, Supabase, and in-memory mock — with pluggable extensions for caching, encryption, soft-delete, audit logging, read replicas, and multi-region writes.
+---
+
+One API to query them all. Drizzle ORM, Prisma, raw SQL, Supabase, or in-memory mock — with pluggable extensions for caching, encryption, soft-delete, audit, read replicas, and multi-region writes.
 
 ```typescript
 import { createDatabaseService } from "@myko/atlas-client";
 
 const db = await createDatabaseService({
   adapter: "drizzle",
-  config: {
-    connectionString: process.env.DATABASE_URL,
-  },
+  config: { connectionString: process.env.DATABASE_URL },
 });
+
+const user = await db.findById("users", "abc-123");
 ```
+
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Choose Your Path](#choose-your-path)
+  - [DrizzleAdapter](#drizzleadapter)
+  - [PrismaAdapter](#prismaadapter)
+  - [SQLAdapter](#sqladapter)
+  - [SupabaseAdapter](#supabaseadapter)
+  - [MockAdapter](#mockadapter)
+- [Extensions](#extensions)
+- [NestJS](#nestjs-integration)
+- [Repository Pattern](#repository-pattern)
+- [Advanced Features](#advanced-features)
+- [API Reference](#api-reference)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Roadmap](#roadmap)
+- [FAQ](#faq)
+- [License](#license)
+
+---
 
 ## Features
 
-- **Multi-adapter** — Drizzle ORM, Prisma, raw SQL, Supabase, Mock
-- **Unified CRUD** — same `findById`, `findMany`, `create`, `update`, `delete` API across all adapters
-- **Extension decorators** — compose caching, encryption, soft-delete, audit, read-replica, multi-write
+- **Multi-adapter** — Drizzle ORM, Prisma, raw SQL, Supabase, Mock — same API for all
+- **Extension decorator chain** — compose Encryption → SoftDelete → Caching → Audit → ReadReplica → MultiWrite
 - **NestJS native** — `AtlasModule.forRoot()` / `forRootAsync()` with dependency injection
-- **Repository pattern** — `BaseRepository<T>` with query builder integration
-- **Advanced features** — sharding, multi-tenancy, connection pooling, monitoring, backup
-- **Dual-mode DrizzleAdapter** — typed ORM mode (PgTable) and raw SQL fallback
-- **`DatabaseResult<T>`** — explicit success/failure monad (no thrown errors)
-- **Dual CJS/ESM** — supports both `require()` and `import`
+- **Repository pattern** — `BaseRepository<T>` with integrated QueryBuilder
+- **Advanced out of the box** — sharding, multi-tenancy, connection pooling, monitoring, backup, migrations, seeds
+- **Dual-mode DrizzleAdapter** — typed ORM (PgTable) where you want it, raw SQL fallback where you don't
+- **`DatabaseResult<T>` monad** — every operation returns success/failure explicitly, no thrown errors
+- **Dual CJS/ESM** — `require()` and `import` both supported
+- **Fully documented** — JSDoc on every public API, comprehensive README
 
-## Installation
+---
+
+## Quick Start
 
 ```bash
 npm install @myko/atlas-client
 ```
-
-### Peer dependencies (optional)
-
-```bash
-# For PrismaAdapter
-npm install @prisma/client
-
-# For DrizzleAdapter (already bundled in deps, but pin if needed)
-npm install drizzle-orm pg
-
-# For NestJS integration
-npm install @nestjs/common
-
-# For advanced caching
-npm install ioredis
-```
-
-## Quick Start
 
 ```typescript
 import { createDatabaseService } from "@myko/atlas-client";
@@ -56,29 +75,54 @@ const db = await createDatabaseService({
   adapter: "drizzle",
   config: {
     connectionString: process.env.DATABASE_URL!,
-    // Custom ID column for tables where PK is not "id"
-    tableIdColumns: { users: "user_id" },
+    tableIdColumns: { users: "user_id" },  // custom PK
   },
 });
 
-// CRUD operations return DatabaseResult<T>
-const result = await db.findById("users", "abc-123");
-if (result.success) {
-  console.log(result.data); // User | null
-}
+// Get by ID
+const user = await db.findById("users", "abc-123");
+if (user.success) console.log(user.data);
 
-const list = await db.findMany("users", {
+// List with filters, pagination, sorting
+const result = await db.findMany("users", {
   filters: [{ field: "email", operator: "eq", value: "test@example.com" }],
   pagination: { limit: 10, offset: 0 },
   sort: [{ field: "createdAt", direction: "desc" }],
 });
 ```
 
-## Adapters
+---
+
+## Installation
+
+```bash
+npm install @myko/atlas-client
+```
+
+### Optional peer dependencies
+
+Only install what you need:
+
+```bash
+# For PrismaAdapter
+npm install @prisma/client
+
+# For NestJS integration
+npm install @nestjs/common
+
+# For advanced Redis caching
+npm install ioredis
+```
+
+`drizzle-orm` and `pg` are bundled — no extra install needed for the DrizzleAdapter.
+
+---
+
+## Choose Your Path
 
 ### DrizzleAdapter
 
-Two modes: **typed ORM** (PgTable objects) and **raw SQL** fallback.
+Two modes: **typed ORM** with registered `PgTable` objects, or **raw SQL** fallback.
 
 ```typescript
 import { createDatabaseService } from "@myko/atlas-client";
@@ -94,31 +138,27 @@ const db = await createDatabaseService({
   config: { connectionString: process.env.DATABASE_URL! },
 });
 
-// Register PgTable for typed-mode queries
+// Register PgTable → typed ORM mode
 const reg = db as any;
 reg.registerTable("users", users, users.id);
 
-// Now queries use Drizzle's query builder (not raw SQL)
+// Now uses Drizzle query builder, not raw SQL
 await db.findById("users", "abc-123");
 ```
 
-If a table is not registered, the adapter falls back to raw SQL using the table name and `"id"` as the default ID column.
+Unregistered tables fall back to `SELECT * FROM "table" WHERE "id" = $1` automatically.
 
 ### PrismaAdapter
 
 ```typescript
 const db = await createDatabaseService({
   adapter: "prisma",
-  config: {
-    datasourceUrl: process.env.DATABASE_URL!,
-  },
+  config: { datasourceUrl: process.env.DATABASE_URL! },
 });
-// Internally uses @prisma/client via dynamic import
+// Loads @prisma/client via dynamic import at runtime
 ```
 
 ### SQLAdapter
-
-Direct PostgreSQL client with full query control:
 
 ```typescript
 const db = await createDatabaseService({
@@ -145,80 +185,75 @@ const db = await createDatabaseService({
 
 ### MockAdapter
 
-In-memory mock for testing with zero infrastructure:
+Zero-infrastructure in-memory database for testing:
 
 ```typescript
 const db = await createDatabaseService({
   adapter: "mock",
   config: {
-    initialData: {
-      users: [{ id: "1", name: "Test" }],
-    },
+    initialData: { users: [{ id: "1", name: "Test" }] },
+    simulateLatency: true, // ~50ms per operation
+    failRate: 0.1,         // 10% chance of simulated failure
     tableIdColumns: { users: "id" },
-    simulateLatency: true, // adds ~50ms delay per operation
-    failRate: 0.1, // 10% chance of simulated failure
   },
 });
 ```
 
+---
+
 ## Extensions
 
-Extensions wrap the base adapter in a decorator chain:
-
-```text
-Base → Encryption → SoftDelete → Caching → Audit → MultiWrite → ReadReplica
-```
-
-They are configured automatically when passed to `createDatabaseService`:
+Extensions wrap the base adapter in a decorator chain. Configure them all in one `createDatabaseService` call:
 
 ```typescript
 const db = await createDatabaseService({
   adapter: "drizzle",
   config: { connectionString: process.env.DATABASE_URL! },
+
   encryption: {
     keys: { email: process.env.ENCRYPTION_KEY! },
     fields: { users: ["email", "phone"] },
     algorithm: "aes-256-gcm",
   },
+
   softDelete: {
     tables: ["users"],
-    deletedAtField: "deletedAt",
   },
+
   caching: {
     enabled: true,
-    ttl: 300, // 5 minutes
+    ttl: 300,
     tables: ["users"],
   },
+
   audit: {
     enabled: true,
     exclude: ["healthCheck"],
   },
+
   readReplica: {
     connectionString: process.env.READ_REPLICA_URL!,
   },
+
   multiWrite: {
-    secondaries: [
-      { connectionString: process.env.SECONDARY_DB_URL! },
-    ],
+    secondaries: [{ connectionString: process.env.SECONDARY_DB_URL! }],
   },
 });
 ```
 
-### Extensions reference
-
 | Extension | Decorator | What it does |
 |-----------|-----------|--------------|
 | Encryption | `EncryptionAdapter` | Transparently encrypts/decrypts specified fields |
-| SoftDelete | `SoftDeleteAdapter` | Intercepts `delete()` to set `deletedAt` instead |
-| Caching | `CachingAdapter` | Caches `findById`/`findMany` results in Redis |
+| SoftDelete | `SoftDeleteAdapter` | Intercepts `delete()` → sets `deletedAt` instead |
+| Caching | `CachingAdapter` | Caches `findById`/`findMany` in Redis |
 | Audit | `AuditAdapter` | Logs all CRUD operations with context |
-| ReadReplica | `ReadReplicaAdapter` | Routes reads to a replica, writes to primary |
-| MultiWrite | `MultiWriteAdapter` | Fan-out writes to multiple regions |
-| MultiRead | `MultiReadAdapter` | Round-robins reads across read replicas |
+| ReadReplica | `ReadReplicaAdapter` | Routes reads to replica, writes to primary |
+| MultiWrite | `MultiWriteAdapter` | Fan-out writes to secondary regions |
+| MultiRead | `MultiReadAdapter` | Round-robins reads across replicas |
+
+---
 
 ## NestJS Integration
-
-Register the module globally:
 
 ```typescript
 import { Module } from "@nestjs/common";
@@ -228,18 +263,13 @@ import { AtlasModule } from "@myko/atlas-client";
   imports: [
     AtlasModule.forRoot({
       adapter: "drizzle",
-      config: {
-        connectionString: process.env.DATABASE_URL!,
-      },
+      config: { connectionString: process.env.DATABASE_URL! },
     }),
   ],
 })
 export class AppModule {}
-```
 
-Async configuration:
-
-```typescript
+// Async configuration
 AtlasModule.forRootAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
@@ -247,10 +277,10 @@ AtlasModule.forRootAsync({
     adapter: "drizzle",
     config: { connectionString: config.get("DATABASE_URL")! },
   }),
-})
+});
 ```
 
-Inject the database service:
+Inject anywhere:
 
 ```typescript
 import { Inject } from "@nestjs/common";
@@ -263,22 +293,22 @@ export class UsersService {
 }
 ```
 
+---
+
 ## Repository Pattern
 
 ```typescript
 import { BaseRepository } from "@myko/atlas-client";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+interface User { id: string; name: string; email: string; }
 
 class UsersRepository extends BaseRepository<User> {
   protected tableName = "users";
 
   async findByEmail(email: string) {
-    return this.findFirst({ filter: { field: "email", operator: "eq", value: email } });
+    return this.findFirst({
+      filter: { field: "email", operator: "eq", value: email },
+    });
   }
 }
 
@@ -286,175 +316,54 @@ const repo = new UsersRepository(db);
 const user = await repo.findById("abc-123");
 ```
 
-## Query Builder
-
-```typescript
-import { QueryBuilder } from "@myko/atlas-client";
-
-const query = QueryBuilder.create()
-  .select("id", "name", "email")
-  .from("users")
-  .where("email", "=", "test@example.com")
-  .orderBy("createdAt", "DESC")
-  .limit(10)
-  .offset(0)
-  .build();
-
-const result = await db.query(query.sql, query.params);
-```
-
-## Health Checking
-
-```typescript
-const status = await db.healthCheck();
-// {
-//   success: true,
-//   data: {
-//     isHealthy: true,
-//     responseTime: 5,
-//     details: { adapter: "drizzle" },
-//   },
-// }
-```
+---
 
 ## Advanced Features
 
-### Sharding
+| Feature | Module | What it does |
+|---------|--------|-------------|
+| Sharding | `ShardKey`, `ShardRouter` | Route queries by shard key |
+| Multi-tenancy | `TenantContext`, `TenantRepository` | Auto-scope queries to tenant |
+| Connection Pool | `DynamicPool` | Configurable min/max/acquire/idle |
+| Monitoring | `MetricsCollector`, `AlertManager` | Track slow queries, N+1 detection |
+| Backup | `BackupService` | Export table data |
+| Migrations | `MigrationManager` | Run/rollback migration batches |
+| Seeds | `SeedManager` | Run seed files |
+| Caching decorators | `@Cacheable`, `@CacheEvict` | Method-level Redis caching |
+| Query Builder | `QueryBuilder` | Fluent SELECT/WHERE/JOIN builder |
+| Security | `SanitizeHtmlPipe` | NestJS HTML sanitization pipe |
 
-```typescript
-import { ShardKey, ShardRouter } from "@myko/atlas-client";
-
-const router = new ShardRouter();
-router.registerShardKey("users", { column: "id", shards: 4 });
-const shard = router.routeToShard("users", "user-123");
-```
-
-### Multi-tenancy
-
-```typescript
-import { TenantContext, TenantRepository } from "@myko/atlas-client";
-
-// Set tenant context
-TenantContext.run({ tenantId: "org-456" }, async () => {
-  const tenantRepo = new TenantRepository(db, "tenant_id");
-  // All queries automatically scoped to tenant
-  const users = await tenantRepo.findMany("users");
-});
-```
-
-### Connection Pooling
-
-```typescript
-import { DynamicPool } from "@myko/atlas-client";
-
-const pool = DynamicPool.create({
-  min: 2,
-  max: 20,
-  acquireTimeout: 5000,
-  idleTimeout: 30000,
-});
-```
-
-### Monitoring
-
-```typescript
-import { MetricsCollector, AlertManager } from "@myko/atlas-client";
-
-const metrics = new MetricsCollector();
-metrics.recordQuery("users", "SELECT", 5); // queryName, type, durationMs
-
-const alerts = new AlertManager();
-alerts.addRule({
-  name: "slow-query",
-  evaluate: () => metrics.getTopSlowQueries(5).length > 3,
-  severity: "warning",
-});
-```
-
-### Backup
-
-```typescript
-import { BackupService } from "@myko/atlas-client";
-
-const backup = new BackupService(db);
-await backup.createBackup({ tables: ["users", "sessions"] });
-```
-
-### Migrations
-
-```typescript
-import { MigrationManager } from "@myko/atlas-client";
-
-const mgr = new MigrationManager(db, {
-  migrationsDir: "./migrations",
-  tableName: "_migrations",
-});
-await mgr.run(); // runs all pending migrations
-await mgr.rollback(); // rolls back the last batch
-```
-
-### Seeds
-
-```typescript
-import { SeedManager } from "@myko/atlas-client";
-
-const seeder = new SeedManager(db, { seedsDir: "./seeds" });
-await seeder.run();
-```
-
-### Caching Decorators
-
-```typescript
-import { Cacheable, CacheEvict } from "@myko/atlas-client";
-
-class UserService {
-  @Cacheable({ ttl: 300 })
-  async getUser(id: string) { /* ... */ }
-
-  @CacheEvict({ key: "getUser" })
-  async updateUser(id: string, data: any) { /* ... */ }
-}
-```
-
-## Security
-
-```typescript
-import { SanitizeHtmlPipe } from "@myko/atlas-client";
-
-// NestJS pipe that sanitizes HTML inputs
-@Body(SanitizeHtmlPipe)
-data: Record<string, any>;
-```
+---
 
 ## API Reference
 
 ### `createDatabaseService(config)`
 
-| Param | Type | Required | Description |
-|-------|------|----------|-------------|
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
 | `adapter` | `"drizzle" \| "prisma" \| "sql" \| "supabase" \| "mock"` | Yes | Backend adapter |
-| `config` | `object` | Yes | Adapter-specific configuration |
+| `config` | `object` | Yes | Adapter-specific config |
 | `config.connectionString` | `string` | For drizzle/sql | PostgreSQL connection string |
-| `config.tableIdColumns` | `Record<string, string>` | No | Custom ID column per table |
-| `encryption` | `object` | No | Encryption extension config |
-| `softDelete` | `object` | No | Soft-delete extension config |
-| `caching` | `object` | No | Caching extension config |
-| `audit` | `object` | No | Audit extension config |
-| `readReplica` | `object` | No | Read-replica extension config |
-| `multiWrite` | `object` | No | Multi-write extension config |
+| `config.tableIdColumns` | `Record<string, string>` | No | Custom PK per table |
+| `encryption` | `object` | No | Encryption extension |
+| `softDelete` | `object` | No | Soft-delete extension |
+| `caching` | `object` | No | Caching extension |
+| `audit` | `object` | No | Audit extension |
+| `readReplica` | `object` | No | Read-replica extension |
+| `multiWrite` | `object` | No | Multi-write extension |
 
-### `DatabaseService`
+### `DatabaseService` methods
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `findById(table, id)` | `DatabaseResult<T \| null>` | Find by primary key |
-| `findOne(table, filter)` | `DatabaseResult<T \| null>` | Find first match |
+| `findById(table, id)` | `DatabaseResult<T \| null>` | By primary key |
+| `findOne(table, filter)` | `DatabaseResult<T \| null>` | First match |
 | `findFirst(table, filter)` | `DatabaseResult<T \| null>` | Alias for findOne |
-| `findMany(table, options?)` | `DatabaseResult<PaginatedResult<T>>` | List with filters, sort, pagination |
-| `create(table, data)` | `DatabaseResult<T>` | Insert row |
-| `update(table, id, data)` | `DatabaseResult<T>` | Update by primary key |
-| `delete(table, id)` | `DatabaseResult<void>` | Delete by primary key |
-| `upsert(table, where, create, update)` | `DatabaseResult<T>` | Insert or update |
+| `findMany(table, opts?)` | `DatabaseResult<PaginatedResult<T>>` | Filtered + sorted + paginated |
+| `create(table, data)` | `DatabaseResult<T>` | Insert |
+| `update(table, id, data)` | `DatabaseResult<T>` | Update by PK |
+| `delete(table, id)` | `DatabaseResult<void>` | Delete by PK |
+| `upsert(table, where, create, upd)` | `DatabaseResult<T>` | Insert on conflict |
 | `updateMany(table, where, data)` | `DatabaseResult<number>` | Bulk update |
 | `deleteMany(table, where)` | `DatabaseResult<number>` | Bulk delete |
 | `batchCreate(table, items)` | `DatabaseResult<T[]>` | Bulk insert |
@@ -462,18 +371,17 @@ data: Record<string, any>;
 | `batchDelete(table, ids)` | `DatabaseResult<number>` | Bulk delete by IDs |
 | `batchUpsert(table, items, key)` | `DatabaseResult<T[]>` | Bulk upsert |
 | `count(table, filter?)` | `DatabaseResult<number>` | Row count |
-| `exists(table, id)` | `DatabaseResult<boolean>` | Existence check |
+| `exists(table, id)` | `DatabaseResult<boolean>` | Exists check |
 | `query(sql, params?)` | `Promise<T[]>` | Raw SQL |
-| `transaction(callback)` | `DatabaseResult<T>` | Transaction with rollback |
+| `transaction(cb)` | `DatabaseResult<T>` | Transaction |
 | `healthCheck()` | `DatabaseResult<HealthStatus>` | Connection health |
-| `registerTable(name, table, idColumn?)` | `void` | Register table for typed mode |
-| `setAuditContext(context)` | `void` | Set audit metadata |
-| `on(event, handler)` | `void` | Subscribe to events |
-| `off(event, handler)` | `void` | Unsubscribe from events |
-| `getStatus()` | `StatusInfo` | Runtime diagnostics |
-| `close()` | `Promise<void>` | Graceful shutdown |
+| `registerTable(name, table, idCol?)` | `void` | Register for typed mode |
+| `setAuditContext(ctx)` | `void` | Audit metadata |
+| `on(event, handler)` | `void` | Subscribe |
+| `off(event, handler)` | `void` | Unsubscribe |
+| `close()` | `Promise<void>` | Shutdown |
 
-### Filter Operators
+### Filter operators
 
 | Operator | Type | Example |
 |----------|------|---------|
@@ -484,48 +392,117 @@ data: Record<string, any>;
 | `lt` | `number \| string` | Less than |
 | `lte` | `number \| string` | Less than or equal |
 | `in` | `any[]` | `{ field: "id", operator: "in", value: ["a", "b"] }` |
-| `notIn` | `any[]` | Not in array |
+| `notIn` | `any[]` | Not in |
 | `like` | `string` | SQL LIKE |
 | `ilike` | `string` | Case-insensitive LIKE |
 | `between` | `[any, any]` | Range inclusive |
 | `isNull` | — | `{ field: "email", operator: "isNull" }` |
-| `isNotNull` | — | Not null |
+| `isNotNull` | — | `{ field: "email", operator: "isNotNull" }` |
 
-## DatabaseResult Monad
+### DatabaseResult monad
 
-Every CRUD method returns `DatabaseResult<T>` — an explicit success/failure wrapper.
-No try/catch needed for expected database errors:
+Every CRUD method returns `DatabaseResult<T>` — never throw for expected errors:
 
 ```typescript
 const result = await db.findById("users", "abc-123");
 
 if (result.success) {
-  // result.data is T | null
   console.log(result.data);
 } else {
-  // result.error is DatabaseError
   console.error(result.error.message, result.error.code);
 }
 ```
 
+---
+
 ## Architecture
 
 ```text
-┌─────────────────────────────────────────────────────┐
-│                   Your Application                   │
-├─────────────────────────────────────────────────────┤
-│                  BaseRepository<T>                   │
-├─────────────────────────────────────────────────────┤
-│                  DatabaseService                     │
-├─────────────────────────────────────────────────────┤
-│   Extension Chain (Encryption → Cache → Audit ...)   │
-├─────────────────────────────────────────────────────┤
-│    DrizzleAdapter │ PrismaAdapter │ SQLAdapter ...   │
-├─────────────────────────────────────────────────────┤
-│              pg │ @prisma/client │ supabase-js       │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────┐
+│           Your Application / NestJS          │
+├─────────────────────────────────────────────┤
+│              BaseRepository<T>               │
+├─────────────────────────────────────────────┤
+│              DatabaseService                 │
+├─────────────────────────────────────────────┤
+│  Extensions (Encrypt → Cache → Audit …)     │
+├─────────────────────────────────────────────┤
+│  Drizzle │ Prisma │ SQL │ Supabase │ Mock    │
+├─────────────────────────────────────────────┤
+│      pg │ @prisma/client │ supabase-js      │
+└─────────────────────────────────────────────┘
 ```
+
+---
+
+## Project Structure
+
+```
+src/
+├── adapters/          # Drizzle, Prisma, SQL, Supabase, Mock
+├── advanced/          # Sharding, multi-tenancy, pools, monitoring, backup
+├── builder/query/     # Fluent QueryBuilder (ORM + SQL)
+├── extensions/        # Encryption, SoftDelete, Caching, Audit, Multi-*
+├── factory/           # AdapterFactory, createDatabaseService
+├── migrations/        # MigrationManager
+├── nestjs/            # AtlasModule, DATABASE_SERVICE token
+├── repository/        # BaseRepository
+├── security/          # HTML sanitizer, validation pipes
+├── seeds/             # SeedManager
+├── service/           # DatabaseService, EventEmitter, HealthManager
+└── utils/             # ConfigMerger, pagination, typeGuards, regex, SQL
+```
+
+---
+
+## Contributing
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feat/my-feature`)
+3. Commit your changes (`npm run build && npm test`)
+4. Push and open a PR
+
+All contributions are welcome — bugs, docs, features, tests.
+
+---
+
+## Roadmap
+
+- [ ] Biome linting + formatting (replace ESLint + Prettier)
+- [ ] Changesets for automated versioning + changelog
+- [ ] GitHub Actions publish workflow with Trusted Publishing (OIDC)
+- [ ] OpenAPI/Swagger integration
+- [ ] GraphQL adapter
+- [ ] Edge runtime support (Vercel Edge, Cloudflare Workers)
+
+---
+
+## FAQ
+
+**Q: Do I need NestJS to use this?**
+No. `createDatabaseService` works standalone. NestJS integration is entirely optional.
+
+**Q: Can I use DrizzleAdapter without registering PgTable objects?**
+Yes. Unregistered tables use raw SQL (`SELECT * FROM "table" WHERE "id" = $1`).
+
+**Q: How do I run migrations?**
+```typescript
+import { MigrationManager } from "@myko/atlas-client";
+const mgr = new MigrationManager(db, { migrationsDir: "./migrations" });
+await mgr.run();
+```
+
+**Q: Does it support transactions?**
+Yes. `db.transaction(async (trx) => { ... })` with automatic commit/rollback.
+
+**Q: What Node.js versions are supported?**
+Node 18+.
+
+**Q: What about edge/worker runtimes?**
+Currently Node.js only. Edge support is on the roadmap.
+
+---
 
 ## License
 
-MIT &mdash; MYKO Labs
+MIT — MYKO Labs
