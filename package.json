@@ -40,10 +40,10 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "@myko/config": "*",
-    "@myko/errors": "*",
-    "@myko/logger": "*",
-    "@myko/types": "*",
+    "@myko/config": "^1.0.0",
+    "@myko/errors": "^1.0.0",
+    "@myko/logger": "^1.1.0",
+    "@myko/types": "^1.0.0",
     "@supabase/supabase-js": "^2.49.4",
     "drizzle-orm": "^0.44.6",
     "pg": "^8.13.3",
