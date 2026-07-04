@@ -1,7 +1,7 @@
-import { NUMERIX } from "@myko/config";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import type { ShardKey } from "@myko/types";
+import { NUMERIX } from "@myko.pk/config";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import type { ShardKey } from "@myko.pk/types";
 
 /**
  * Manages shard key definitions and calculations.

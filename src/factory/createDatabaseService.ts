@@ -24,9 +24,9 @@ import { EncryptionAdapter } from "../extensions/EncryptionExtension";
 import { CachingAdapter } from "../extensions/CachingAdapter";
 import { ReadReplicaAdapter } from "../extensions/ReadReplicaAdapter";
 import { MultiWriteAdapter } from "../extensions/MultiWriteExtension";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import { ADAPTER_TYPES, ADAPTERS } from "@myko/types/db";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import { ADAPTER_TYPES, ADAPTERS } from "@myko.pk/types/db";
 import type {
   DatabaseServiceInterface,
   DrizzleConfig,
@@ -36,7 +36,7 @@ import type {
   DatabaseAdapterType,
   DatabaseConfig,
   DatabaseServiceConfig,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 
 /**
  * ADAPTER CHAIN BUILDER - Decorator Pattern Implementation
@@ -280,7 +280,7 @@ function validateConfig(config: DatabaseServiceConfig): void {
  * @example
  * ### Basic Setup (app.ts)
  * ```typescript
- * import { createDatabaseService, Tables } from '@myko/atlas-client';
+ * import { createDatabaseService, Tables } from '@myko.pk/atlas-client';
  *
  * // Called once at application startup
  * const db = await createDatabaseService({

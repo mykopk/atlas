@@ -1,6 +1,6 @@
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import type { PaginationOptions, SortOptions, Filter } from "@myko/types/db";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import type { PaginationOptions, SortOptions, Filter } from "@myko.pk/types/db";
 import { DB_REGEX } from "@utils/regex";
 
 /**

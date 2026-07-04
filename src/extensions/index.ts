@@ -1,6 +1,6 @@
 /**
  * @fileoverview Database Extension Adapters — Advanced Database Functionality
- * @module @myko/atlas-client/extensions
+ * @module @mykopk/atlas-client/extensions
  *
  * Provides a collection of extension adapters that enhance core database operations
  * with advanced features such as soft deletes, encryption, audit logging, caching,

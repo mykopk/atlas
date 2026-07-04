@@ -35,9 +35,9 @@ import type {
   Filter,
   MultiReadConfig,
   ReplicaHealth,
-} from "@myko/types/db";
-import { DatabaseError } from "@myko/errors";
-import { ERROR_CODES } from "@myko/errors";
+} from "@myko.pk/types/db";
+import { DatabaseError } from "@myko.pk/errors";
+import { ERROR_CODES } from "@myko.pk/errors";
 import { failure } from "@utils/databaseResultHelpers";
 
 /** Weight for existing average in EMA calculation */

@@ -7,15 +7,15 @@ import type {
   DatabaseHealthStatus,
   Transaction,
   SupabaseAdapterConfig,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import { failure, success } from "@utils/databaseResultHelpers";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 
 import { calculatePagination } from "@utils/pagination";
-import { NUMERIX } from "@myko/config";
+import { NUMERIX } from "@myko.pk/config";
 
 /**
  * @class SupabaseAdapter

@@ -1,5 +1,5 @@
 /**
- * @module @myko/atlas-client/advanced/multi-tenancy
+ * @module @mykopk/atlas-client/advanced/multi-tenancy
  *
  * Multi-tenant data isolation for Atlas clients.
  *
@@ -11,7 +11,7 @@
  *
  * @example
  * ```typescript
- * import { TenantContext, TenantRepository } from "@myko/atlas-client/advanced/multi-tenancy";
+ * import { TenantContext, TenantRepository } from "@myko.pk/atlas-client/advanced/multi-tenancy";
  *
  * class UserRepo extends TenantRepository<User> {
  *   protected getTenantIdField(): keyof User { return "tenantId"; }

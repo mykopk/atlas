@@ -15,7 +15,7 @@
  *
  * @example
  * ```typescript
- * import { isString } from '@myko/atlas-client/utils';
+ * import { isString } from '@myko.pk/atlas-client/utils';
  *
  * if (isString(userInput)) {
  *   // userInput is now typed as string
@@ -35,7 +35,7 @@ export function isString(value: unknown): value is string {
  *
  * @example
  * ```typescript
- * import { isNonEmptyString } from '@myko/atlas-client/utils';
+ * import { isNonEmptyString } from '@myko.pk/atlas-client/utils';
  *
  * if (isNonEmptyString(tableName)) {
  *   // tableName is guaranteed to be a non-empty string

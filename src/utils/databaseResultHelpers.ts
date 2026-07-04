@@ -11,7 +11,7 @@
  *
  */
 
-import type { DatabaseResult } from "@myko/types/db";
+import type { DatabaseResult } from "@myko.pk/types/db";
 
 /**
  * Creates a successful DatabaseResult wrapper for operation results
@@ -32,7 +32,7 @@ import type { DatabaseResult } from "@myko/types/db";
  *
  * @example
  * ```typescript
- * import { success } from '@myko/atlas-client/utils';
+ * import { success } from '@myko.pk/atlas-client/utils';
  *
  * // In adapter methods
  * async findById<T>(table: string, id: string): Promise<DatabaseResult<T | null>> {
@@ -75,9 +75,9 @@ export function success<T = null>(value: T = null as T): DatabaseResult<T> {
  * 
  * @example
  * ```typescript
- * import { failure } from '@myko/atlas-client/utils';
- * import { DatabaseError } from '@myko/errors';
-import { DATABASE_ERROR_CODES } from '@myko/errors';
+ * import { failure } from '@myko.pk/atlas-client/utils';
+ * import { DatabaseError } from '@myko.pk/errors';
+import { DATABASE_ERROR_CODES } from '@myko.pk/errors';
  * 
  * // In adapter methods
  * async create<T>(table: string, data: T): Promise<DatabaseResult<T>> {

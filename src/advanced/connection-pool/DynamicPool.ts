@@ -1,18 +1,18 @@
 import { Pool } from "pg";
 import type { PoolClient } from "pg";
 import { failure, success } from "@utils/databaseResultHelpers";
-import { logger } from "@myko/logger";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { logger } from "@myko.pk/logger";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 import {
   type DatabaseResult,
   type DatabaseHealthStatus,
   type DynamicPoolConfig,
   type PoolMetrics,
   DB_POOL_EVENTS,
-} from "@myko/types/db";
-import { NUMERIX } from "@myko/config";
-import { dynamicPoolDefaultConfig } from "@myko/config/db";
+} from "@myko.pk/types/db";
+import { NUMERIX } from "@myko.pk/config";
+import { dynamicPoolDefaultConfig } from "@myko.pk/config/db";
 
 /**
  * Dynamic connection pool that automatically adjusts size based on load.

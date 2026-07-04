@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for considering contributing to **@myko/atlas** — we appreciate every bug report, documentation fix, feature suggestion, and pull request.
+Thank you for considering contributing to **@itsmyko/atlas** — we appreciate every bug report, documentation fix, feature suggestion, and pull request.
 
 ## Table of Contents
 

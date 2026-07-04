@@ -1,6 +1,6 @@
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import { logger } from "@myko/logger";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import { logger } from "@myko.pk/logger";
 import type {
   DatabaseAdapterType,
   DatabaseResult,
@@ -11,12 +11,12 @@ import type {
   Transaction,
   AuditContext,
   AuditEvent,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 import {
   AUDIT_OPERATION,
   AUDIT_CATEGORY,
   EXTENSION_SOURCE,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 
 /** Minimum width for padded date parts (month, day) */
 const DATE_PART_MIN_WIDTH = 2;

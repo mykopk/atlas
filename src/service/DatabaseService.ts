@@ -1,8 +1,8 @@
 import { DatabaseEventEmitter } from "./EventEmitter";
 import { HealthManager } from "./HealthManager";
 import { ConfigMerger } from "@utils/ConfigMerger";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 import type {
   AuditContext,
   BatchUpdate,
@@ -24,8 +24,8 @@ import type {
   TableName,
   TransactionFn,
   UpdateInput,
-} from "@myko/types/db";
-import { ADAPTERS } from "@myko/types/db";
+} from "@myko.pk/types/db";
+import { ADAPTERS } from "@myko.pk/types/db";
 import { failure, success } from "@utils/databaseResultHelpers";
 
 /**

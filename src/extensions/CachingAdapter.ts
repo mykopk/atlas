@@ -1,5 +1,5 @@
-import { NUMERIX } from "@myko/config";
-import { logger } from "@myko/logger";
+import { NUMERIX } from "@myko.pk/config";
+import { logger } from "@myko.pk/logger";
 import type {
   DatabaseAdapterType,
   DatabaseResult,
@@ -9,7 +9,7 @@ import type {
   PaginatedResult,
   QueryOptions,
   Transaction,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 /**
  * CACHING ADAPTER - Query Result Caching Layer
  *

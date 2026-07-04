@@ -1,8 +1,8 @@
 import { EventEmitter } from "events";
-import { logger } from "@myko/logger";
-import { NUMERIX } from "@myko/config";
-import type { Alert, AlertRule, PoolMetrics, QueryMetrics } from "@myko/types";
-import { ALERT_RULE_ID, ALERT_SEVERITY, ALERT_SOURCE } from "@myko/types";
+import { logger } from "@myko.pk/logger";
+import { NUMERIX } from "@myko.pk/config";
+import type { Alert, AlertRule, PoolMetrics, QueryMetrics } from "@myko.pk/types";
+import { ALERT_RULE_ID, ALERT_SEVERITY, ALERT_SOURCE } from "@myko.pk/types";
 
 /**
  * Manages database alerts with configurable rules and automatic resolution.

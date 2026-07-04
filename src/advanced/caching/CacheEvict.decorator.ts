@@ -1,7 +1,7 @@
 import type { RedisCache } from "./RedisCache";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import type { CacheEvictOptions } from "@myko/types";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import type { CacheEvictOptions } from "@myko.pk/types";
 import { DB_REGEX } from "@utils/regex";
 import { isString } from "@utils/typeGuards";
 

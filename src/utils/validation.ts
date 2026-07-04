@@ -10,10 +10,10 @@
  *
  */
 
-import type { Filter } from "@myko/types/db";
+import type { Filter } from "@myko.pk/types/db";
 import { isString, isNonEmptyString, isObject } from "./typeGuards";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 import { DB_REGEX } from "./regex";
 
 /**
@@ -28,7 +28,7 @@ import { DB_REGEX } from "./regex";
  *
  * @example
  * ```typescript
- * import { validateFilter } from '@myko/atlas-client';
+ * import { validateFilter } from '@myko.pk/atlas-client';
  *
  * // Valid filter for DatabaseService operations
  * const validFilter = { field: 'user_name', operator: 'eq', value: 'john_doe' };
@@ -82,7 +82,7 @@ export const validOperators = [
  *
  * @example
  * ```typescript
- * import { validateFilter } from '@myko/atlas-client';
+ * import { validateFilter } from '@myko.pk/atlas-client';
  *
  * const validFilter = { field: 'user_name', operator: 'eq', value: 'john_doe' };
  * console.log(validateFilter(validFilter)); // true
@@ -190,7 +190,7 @@ export function validateFilter(filter: Filter): boolean {
  *
  * @example
  * ```typescript
- * import { validateTableName } from '@myko/atlas-client';
+ * import { validateTableName } from '@myko.pk/atlas-client';
  *
  * // Valid table names for DatabaseService
  * console.log(validateTableName('users')); // true
@@ -257,7 +257,7 @@ export function validateTableName(name: string): boolean {
  *
  * @example
  * ```typescript
- * import { validateId } from '@myko/atlas-client';
+ * import { validateId } from '@myko.pk/atlas-client';
  *
  * // Valid IDs for DatabaseService.findById()
  * console.log(validateId('user_123')); // true
@@ -330,7 +330,7 @@ export function validateId(id: string): boolean {
  *
  * @example
  * ```typescript
- * import { sanitizeInput } from '@myko/atlas-client';
+ * import { sanitizeInput } from '@myko.pk/atlas-client';
  *
  * // Sanitize user input before database operations
  * const userInput = "Robert'); DROP TABLE users; --";

@@ -14,7 +14,7 @@ import type {
   SelectClause,
   QueryBuilderResult,
   QueryExecutor,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 
 /**
  * Re-exported database filter operator type.

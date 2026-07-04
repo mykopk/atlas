@@ -16,11 +16,11 @@ import type {
   DatabaseHealthStatus,
   DatabaseResult,
   HealthManagerConfig,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 import { success, failure } from "@utils/databaseResultHelpers";
 import { normalizeDetails } from "@utils/normalizeDetails";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 
 /** Default number of consecutive failures before triggering failover */
 const DEFAULT_FAILOVER_THRESHOLD = 3;

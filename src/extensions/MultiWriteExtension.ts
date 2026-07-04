@@ -34,9 +34,9 @@ import type {
   DatabaseHealthStatus,
   Filter,
   MultiWriteConfig,
-} from "@myko/types/db";
-import { DatabaseError } from "@myko/errors";
-import { ERROR_CODES } from "@myko/errors";
+} from "@myko.pk/types/db";
+import { DatabaseError } from "@myko.pk/errors";
+import { ERROR_CODES } from "@myko.pk/errors";
 
 /**
  * MultiWriteAdapter - Extension for multi-adapter write replication

@@ -1,6 +1,6 @@
-import { NUMERIX } from "@myko/config";
-import { logger } from "@myko/logger";
-import type { PoolMetrics, QueryMetrics } from "@myko/types";
+import { NUMERIX } from "@myko.pk/config";
+import { logger } from "@myko.pk/logger";
+import type { PoolMetrics, QueryMetrics } from "@myko.pk/types";
 import { EventEmitter } from "events";
 import { DB_REGEX } from "@utils/regex";
 

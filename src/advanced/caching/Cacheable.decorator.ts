@@ -1,6 +1,6 @@
 import { isString } from "@utils/typeGuards";
 import type { RedisCache } from "./RedisCache";
-import type { CacheableOptions, DatabaseResult } from "@myko/types/db";
+import type { CacheableOptions, DatabaseResult } from "@myko.pk/types/db";
 
 /**
  * Decorator that caches the result of a method.

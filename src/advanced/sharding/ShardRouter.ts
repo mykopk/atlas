@@ -1,7 +1,7 @@
 import { ShardKeyManager } from "./ShardKey";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import type { ShardConfig, ShardKey } from "@myko/types";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import type { ShardConfig, ShardKey } from "@myko.pk/types";
 
 /**
  * Routes database operations to the appropriate shard based on shard keys.

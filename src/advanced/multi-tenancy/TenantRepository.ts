@@ -1,14 +1,14 @@
 import { TenantContext } from "./TenantContext";
 import { failure } from "@utils/databaseResultHelpers";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 import type {
   DatabaseAdapterType,
   DatabaseResult,
   PaginatedResult,
   QueryOptions,
   TenantValidationContext,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 
 /**
  * Abstract base repository that automatically enforces tenant isolation

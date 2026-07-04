@@ -8,7 +8,7 @@
  *
  * @example
  * ```typescript
- * import { AtlasModule } from '@myko/atlas-client/nestjs';
+ * import { AtlasModule } from '@myko.pk/atlas-client/nestjs';
  *
  * @Module({
  *   imports: [AtlasModule.forRoot({ adapter: 'postgres', connectionString })],

@@ -10,7 +10,7 @@
  * soft delete), and advanced features (caching, read replicas, multi-tenancy).
  */
 
-import { NUMERIX } from "@myko/config";
+import { NUMERIX } from "@myko.pk/config";
 import type {
   DatabaseServiceConfig,
   DBCacheConfig,
@@ -19,7 +19,7 @@ import type {
   ResolvedOperationConfig,
   SoftDeleteConfig,
   TimestampsConfig,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 
 /**
  *  CONFIG MERGER - Configuration Resolution Engine

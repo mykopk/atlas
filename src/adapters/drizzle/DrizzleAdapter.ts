@@ -39,13 +39,13 @@ import type {
   Filter,
   Transaction,
   SortOptions,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 import { failure, success } from "@utils/databaseResultHelpers";
-import { DatabaseError } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
 import { isNonEmptyString, isObject } from "@utils/typeGuards";
-import { DATABASE_ERROR_CODES, type ErrorCodeValue } from "@myko/errors";
+import { DATABASE_ERROR_CODES, type ErrorCodeValue } from "@myko.pk/errors";
 import { DB_REGEX } from "@utils/regex";
-import type { BuildWhereClauseOptions } from "@myko/types/db";
+import type { BuildWhereClauseOptions } from "@myko.pk/types/db";
 
 /**
  * Minimum number of elements required in the value array for the BETWEEN operator.

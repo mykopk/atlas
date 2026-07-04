@@ -38,7 +38,7 @@ import { isObject } from "./typeGuards";
  *
  * @example
  * ```typescript
- * import { normalizeDetails } from '@myko/atlas-client/utils';
+ * import { normalizeDetails } from '@myko.pk/atlas-client/utils';
  *
  * // Object normalization
  * const objDetails = normalizeDetails({

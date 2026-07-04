@@ -16,7 +16,7 @@ import type {
   CreateInput,
   OperationConfig,
   FindFirstOptions,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 import { QueryBuilder } from "../builder/query/QueryBuilder";
 
 /**

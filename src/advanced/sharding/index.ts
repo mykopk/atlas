@@ -1,5 +1,5 @@
 /**
- * @module @myko/atlas-client/advanced/sharding
+ * @module @mykopk/atlas-client/advanced/sharding
  *
  * Database sharding infrastructure for Atlas clients.
  *
@@ -12,7 +12,7 @@
  *
  * @example
  * ```typescript
- * import { ShardRouter } from "@myko/atlas-client/advanced/sharding";
+ * import { ShardRouter } from "@myko.pk/atlas-client/advanced/sharding";
  *
  * const router = new ShardRouter([
  *   { id: 0, connectionString: "pg://shard0:5432/db", isPrimary: true },

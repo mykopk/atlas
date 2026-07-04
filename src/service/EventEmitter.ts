@@ -55,17 +55,17 @@ import type {
   HealthChangeEvent,
   QueryErrorEvent,
   TransactionRollbackEvent,
-} from "@myko/types";
+} from "@myko.pk/types";
 import type {
   EmitQueryErrorOptions,
   DatabaseExecutionContext,
-} from "@myko/types/db";
-import { DATABASE_EVENT_TYPE } from "@myko/types";
-import type { ADAPTERS } from "@myko/types";
-import { logger } from "@myko/logger";
+} from "@myko.pk/types/db";
+import { DATABASE_EVENT_TYPE } from "@myko.pk/types";
+import type { ADAPTERS } from "@myko.pk/types";
+import { logger } from "@myko.pk/logger";
 import { isString, isObject } from "@utils/typeGuards";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 
 /**
  * Event emitter for database events that implements the observer pattern.

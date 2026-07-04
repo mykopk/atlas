@@ -11,10 +11,10 @@ import type {
   SupabaseAdapterConfig,
   DbMockAdapterConfig,
   PrismaAdapterConfig,
-} from "@myko/types/db";
-import { ADAPTERS } from "@myko/types/db";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+} from "@myko.pk/types/db";
+import { ADAPTERS } from "@myko.pk/types/db";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 
 /**
  * Factory for creating database adapter instances.

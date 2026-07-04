@@ -1,5 +1,5 @@
 import { DynamicModule, Module, Provider, Type } from "@nestjs/common";
-import type { DatabaseServiceConfig, DatabaseServiceInterface } from "@myko/types/db";
+import type { DatabaseServiceConfig, DatabaseServiceInterface } from "@myko.pk/types/db";
 import { createDatabaseService } from "../factory/createDatabaseService";
 import { DATABASE_SERVICE } from "./atlas.constants";
 

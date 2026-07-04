@@ -9,11 +9,11 @@ import {
 } from "fs";
 import { join } from "path";
 import { failure, success } from "@utils/databaseResultHelpers";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import { logger } from "@myko/logger";
-import type { BackupConfig, BackupInfo, DatabaseResult } from "@myko/types/db";
-import { NUMERIX } from "@myko/config";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import { logger } from "@myko.pk/logger";
+import type { BackupConfig, BackupInfo, DatabaseResult } from "@myko.pk/types/db";
+import { NUMERIX } from "@myko.pk/config";
 import { isString } from "@utils/typeGuards";
 import { DB_REGEX } from "@utils/regex";
 

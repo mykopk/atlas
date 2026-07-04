@@ -31,10 +31,10 @@ import type {
   SeedFile,
   SeedRecord,
   SeedManagerConfig,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 import { success, failure } from "../utils/databaseResultHelpers";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 import * as fs from "fs";
 import * as path from "path";
 

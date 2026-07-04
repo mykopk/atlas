@@ -7,7 +7,7 @@ import type {
   Filter,
   DatabaseHealthStatus,
   ReadReplicaConfig,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 
 /**
  * Read replica extension that routes read operations to replicas.

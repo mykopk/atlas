@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module @myko/atlas-client
+ * @module @mykopk/atlas-client
  *
  * @description
  * Central barrel file for the @myko/atlas-client package.
@@ -13,7 +13,7 @@
  *
  * Consumers should import from this entry point:
  * ```typescript
- * import { DatabaseService, createDatabaseService } from '@myko/atlas-client';
+ * import { DatabaseService, createDatabaseService } from '@myko.pk/atlas-client';
  * ```
  */
 // Core exports
@@ -21,7 +21,7 @@ export { DatabaseService } from "./service/DatabaseService";
 export { createDatabaseService } from "./factory/createDatabaseService";
 
 // Type re-exports for config files (JSDoc support)
-export type { DatabaseServiceConfig, DatabaseServiceInterface } from "@myko/types/db";
+export type { DatabaseServiceConfig, DatabaseServiceInterface } from "@myko.pk/types/db";
 
 // Factory exports
 export { AdapterFactory } from "./factory/AdapterFactory";

@@ -1,9 +1,9 @@
 import { Redis } from "ioredis";
 import { failure, success } from "@utils/databaseResultHelpers";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import type { DatabaseResult } from "@myko/types/db";
-import { NUMERIX } from "@myko/config";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import type { DatabaseResult } from "@myko.pk/types/db";
+import { NUMERIX } from "@myko.pk/config";
 
 /**
  * Redis-based caching service for database query results.

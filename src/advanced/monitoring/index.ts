@@ -1,5 +1,5 @@
 /**
- * @module @myko/atlas-client/advanced/monitoring
+ * @module @mykopk/atlas-client/advanced/monitoring
  *
  * Database monitoring infrastructure for Atlas clients.
  *
@@ -12,7 +12,7 @@
  *
  * @example
  * ```typescript
- * import { MetricsCollector, AlertManager } from "@myko/atlas-client/advanced/monitoring";
+ * import { MetricsCollector, AlertManager } from "@myko.pk/atlas-client/advanced/monitoring";
  *
  * const collector = new MetricsCollector();
  * const alerts = new AlertManager();

@@ -30,11 +30,11 @@ import type {
   Filter,
   FindFirstOptions,
   DbMockAdapterConfig,
-} from "@myko/types/db";
+} from "@myko.pk/types/db";
 
 import { success, failure } from "../../utils/databaseResultHelpers";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 import { calculatePagination } from "../../utils/pagination";
 
 /** Default pagination limit when none is specified by the caller. */

@@ -12,10 +12,10 @@
  * @module pagination
  */
 
-import type { PaginationInfo, PaginationOptions } from "@myko/types";
+import type { PaginationInfo, PaginationOptions } from "@myko.pk/types";
 import { isNumber } from "./typeGuards";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
 
 /**
  * Validates pagination input parameters for safety and consistency
@@ -120,7 +120,7 @@ function validatePaginationInputs(
  *
  * @example
  * ```typescript
- * import { calculatePagination } from '@myko/atlas-client/utils';
+ * import { calculatePagination } from '@myko.pk/atlas-client/utils';
  *
  * // Standard pagination (page 2 of 20 items per page)
  * const pagination1 = calculatePagination(100, { limit: 20, offset: 20 });

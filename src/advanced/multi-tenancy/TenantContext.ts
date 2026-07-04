@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "async_hooks";
-import { DatabaseError } from "@myko/errors";
-import { DATABASE_ERROR_CODES } from "@myko/errors";
-import type { TenantInfo } from "@myko/types";
+import { DatabaseError } from "@myko.pk/errors";
+import { DATABASE_ERROR_CODES } from "@myko.pk/errors";
+import type { TenantInfo } from "@myko.pk/types";
 
 /**
  * Manages tenant context throughout the application using AsyncLocalStorage.

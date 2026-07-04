@@ -1,4 +1,4 @@
-import type { DatabaseAdapterType } from "@myko/types/db";
+import type { DatabaseAdapterType } from "@myko.pk/types/db";
 
 /**
  * Abstract base class for database adapters.

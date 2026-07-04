@@ -1,5 +1,5 @@
 /**
- * @module @myko/atlas-client/utils
+ * @module @mykopk/atlas-client/utils
  *
  * Barrel module that re-exports all utility functions, type guards, validation helpers,
  * pagination utilities, configuration merging, SQL utilities, and database result helpers
@@ -9,7 +9,7 @@
  *
  * @example
  * ```typescript
- * import { success, failure, calculatePagination, isString, validateFilter } from '@myko/atlas-client/utils';
+ * import { success, failure, calculatePagination, isString, validateFilter } from '@myko.pk/atlas-client/utils';
  * ```
  */
 export * from "./typeGuards";

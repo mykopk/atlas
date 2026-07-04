@@ -1,4 +1,4 @@
-import type { Filter, SortOptions, PaginationOptions } from "@myko/types/db";
+import type { Filter, SortOptions, PaginationOptions } from "@myko.pk/types/db";
 
 const FILTER_OP_TO_PRISMA: Record<string, string> = {
   eq: "equals",

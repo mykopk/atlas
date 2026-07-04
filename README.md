@@ -1,19 +1,19 @@
 <p align="center">
-  <h1 align="center">@myko/atlas</h1>
+  <h1 align="center">@myko.pk/atlas</h1>
   <p align="center"><strong>One API. Any Database.</strong></p>
   <p align="center">Unified database abstraction layer for the MYKO ecosystem — Drizzle ORM, Prisma, raw SQL, Supabase, or Mock.</p>
   <p align="center">
-    <a href="https://www.npmjs.com/package/@myko/atlas"><img src="https://img.shields.io/npm/v/@myko/atlas" alt="npm version"></a>
-    <a href="https://www.npmjs.com/package/@myko/atlas"><img src="https://img.shields.io/npm/dm/@myko/atlas" alt="npm downloads"></a>
+    <a href="https://www.npmjs.com/package/@myko.pk/atlas"><img src="https://img.shields.io/npm/v/@myko.pk/atlas" alt="npm version"></a>
+    <a href="https://www.npmjs.com/package/@myko.pk/atlas"><img src="https://img.shields.io/npm/dm/@myko.pk/atlas" alt="npm downloads"></a>
     <a href="https://github.com/mykopk/atlas/actions"><img src="https://img.shields.io/github/actions/workflow/status/mykopk/atlas/.github/workflows/ci.yml?branch=main" alt="build"></a>
-    <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@myko/atlas" alt="license"></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@myko.pk/atlas" alt="license"></a>
   </p>
 </p>
 
 ---
 
 ```typescript
-import { createDatabaseService } from "@myko/atlas";
+import { createDatabaseService } from "@myko.pk/atlas";
 
 const db = await createDatabaseService({
   adapter: "drizzle",
@@ -23,11 +23,11 @@ const db = await createDatabaseService({
 const user = await db.findById("users", "abc-123");
 ```
 
-## Why @myko/atlas?
+## Why @myko.pk/atlas?
 
 Every MYKO service needs a database. But not every service uses the same stack — some use Drizzle ORM, some still run Prisma, others talk directly to PostgreSQL or Supabase. Without a common layer, each service duplicates the same boilerplate: connection management, error handling, pagination, caching, audit logs, encryption.
 
-**@myko/atlas** gives every service the same database API regardless of what's underneath. Swap Drizzle for Prisma (or vice versa) by changing one config line — zero code changes in your repositories. Need encryption? Add a config block. Need caching? Add another. All extensions compose transparently without touching your business logic.
+**@myko.pk/atlas** gives every service the same database API regardless of what's underneath. Swap Drizzle for Prisma (or vice versa) by changing one config line — zero code changes in your repositories. Need encryption? Add a config block. Need caching? Add another. All extensions compose transparently without touching your business logic.
 
 ```typescript
 // Same API, different adapter — only the config changes
@@ -78,11 +78,11 @@ const db = await createDatabaseService({ adapter: "sql",     ... });
 ## Quick Start
 
 ```bash
-npm install @myko/atlas-client
+npm install @myko.pk/atlas-client
 ```
 
 ```typescript
-import { createDatabaseService } from "@myko/atlas";
+import { createDatabaseService } from "@myko.pk/atlas";
 
 const db = await createDatabaseService({
   adapter: "drizzle",
@@ -109,7 +109,7 @@ const result = await db.findMany("users", {
 ## Installation
 
 ```bash
-npm install @myko/atlas-client
+npm install @myko.pk/atlas-client
 ```
 
 ### Optional peer dependencies
@@ -138,7 +138,7 @@ npm install ioredis
 Two modes: **typed ORM** with registered `PgTable` objects, or **raw SQL** fallback.
 
 ```typescript
-import { createDatabaseService } from "@myko/atlas";
+import { createDatabaseService } from "@myko.pk/atlas";
 import { pgTable, uuid, text } from "drizzle-orm/pg-core";
 
 const users = pgTable("users", {
@@ -270,7 +270,7 @@ const db = await createDatabaseService({
 
 ```typescript
 import { Module } from "@nestjs/common";
-import { AtlasModule } from "@myko/atlas-client";
+import { AtlasModule } from "@myko.pk/atlas-client";
 
 @Module({
   imports: [
@@ -297,7 +297,7 @@ Inject anywhere:
 
 ```typescript
 import { Inject } from "@nestjs/common";
-import { DATABASE_SERVICE, DatabaseService } from "@myko/atlas-client";
+import { DATABASE_SERVICE, DatabaseService } from "@myko.pk/atlas-client";
 
 export class UsersService {
   constructor(
@@ -311,7 +311,7 @@ export class UsersService {
 ## Repository Pattern
 
 ```typescript
-import { BaseRepository } from "@myko/atlas-client";
+import { BaseRepository } from "@myko.pk/atlas-client";
 
 interface User { id: string; name: string; email: string; }
 
@@ -500,7 +500,7 @@ Yes. Unregistered tables use raw SQL (`SELECT * FROM "table" WHERE "id" = $1`).
 
 **Q: How do I run migrations?**
 ```typescript
-import { MigrationManager } from "@myko/atlas-client";
+import { MigrationManager } from "@myko.pk/atlas-client";
 const mgr = new MigrationManager(db, { migrationsDir: "./migrations" });
 await mgr.run();
 ```
