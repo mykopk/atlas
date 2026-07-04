@@ -1,16 +1,16 @@
 <p align="center">
   <h1 align="center">@myko/atlas</h1>
-  <p align="center">Universal database abstraction layer for the MYKO ecosystem.</p>
+  <p align="center"><strong>One API. Any Database.</strong></p>
+  <p align="center">Unified database abstraction layer for the MYKO ecosystem — Drizzle ORM, Prisma, raw SQL, Supabase, or Mock.</p>
   <p align="center">
     <a href="https://www.npmjs.com/package/@myko/atlas"><img src="https://img.shields.io/npm/v/@myko/atlas" alt="npm version"></a>
     <a href="https://www.npmjs.com/package/@myko/atlas"><img src="https://img.shields.io/npm/dm/@myko/atlas" alt="npm downloads"></a>
+    <a href="https://github.com/mykopk/atlas/actions"><img src="https://img.shields.io/github/actions/workflow/status/mykopk/atlas/.github/workflows/ci.yml?branch=main" alt="build"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@myko/atlas" alt="license"></a>
   </p>
 </p>
 
 ---
-
-One API to query them all. Drizzle ORM, Prisma, raw SQL, Supabase, or in-memory mock — with pluggable extensions for caching, encryption, soft-delete, audit, read replicas, and multi-region writes.
 
 ```typescript
 import { createDatabaseService } from "@myko/atlas";
@@ -21,6 +21,19 @@ const db = await createDatabaseService({
 });
 
 const user = await db.findById("users", "abc-123");
+```
+
+## Why @myko/atlas?
+
+Every MYKO service needs a database. But not every service uses the same stack — some use Drizzle ORM, some still run Prisma, others talk directly to PostgreSQL or Supabase. Without a common layer, each service duplicates the same boilerplate: connection management, error handling, pagination, caching, audit logs, encryption.
+
+**@myko/atlas** gives every service the same database API regardless of what's underneath. Swap Drizzle for Prisma (or vice versa) by changing one config line — zero code changes in your repositories. Need encryption? Add a config block. Need caching? Add another. All extensions compose transparently without touching your business logic.
+
+```typescript
+// Same API, different adapter — only the config changes
+const db = await createDatabaseService({ adapter: "drizzle", ... });
+const db = await createDatabaseService({ adapter: "prisma",  ... });
+const db = await createDatabaseService({ adapter: "sql",     ... });
 ```
 
 ## Table of Contents
