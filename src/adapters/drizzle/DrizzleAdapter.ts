@@ -26,6 +26,7 @@ import {
   desc,
   sql,
   and,
+  or,
 } from "drizzle-orm";
 import type { PgTable, PgSelectBase } from "drizzle-orm/pg-core";
 import { PgColumn } from "drizzle-orm/pg-core";
@@ -688,13 +689,38 @@ export class DrizzleAdapter implements DatabaseAdapterType {
       let whereClause = "";
       let paramIndex = 1;
 
-      const activeFilters = options?.filters?.length
-        ? options.filters
-        : options?.filter
-          ? [options.filter]
-          : [];
-      if (activeFilters.length > 0) {
-        const clauses: string[] = [];
+      const clauses: string[] = [];
+
+      if (options?.orFilters && options.orFilters.length > 0) {
+        const orClauses: string[] = [];
+        for (const group of options.orFilters) {
+          if (group.length === 0) continue;
+          const groupClauses: string[] = [];
+          for (const f of group) {
+            const clause = this.buildSqlWhereClause({
+              field: f.field,
+              operator: f.operator,
+              value: f.value,
+              params,
+              startIndex: paramIndex,
+            });
+            groupClauses.push(clause.replace(/^\s*WHERE\s+/i, ""));
+            paramIndex = params.length + 1;
+          }
+          if (groupClauses.length > 0) {
+            if (groupClauses.length === 1) orClauses.push(groupClauses[0]);
+            else orClauses.push(`(${groupClauses.join(" AND ")})`);
+          }
+        }
+        if (orClauses.length > 0) {
+          clauses.push(`(${orClauses.join(" OR ")})`);
+        }
+      } else {
+        const activeFilters = options?.filters?.length
+          ? options.filters
+          : options?.filter
+            ? [options.filter]
+            : [];
         for (const f of activeFilters) {
           const clause = this.buildSqlWhereClause({
             field: f.field,
@@ -706,6 +732,19 @@ export class DrizzleAdapter implements DatabaseAdapterType {
           clauses.push(clause.replace(/^\s*WHERE\s+/i, ""));
           paramIndex = params.length + 1;
         }
+      }
+
+      if (options?.rawConditions && options.rawConditions.length > 0) {
+        for (const rc of options.rawConditions) {
+          if (!rc.clause) continue;
+          const renumbered = this.renumberRawClause(rc.clause, paramIndex);
+          clauses.push(renumbered);
+          params.push(...rc.params);
+          paramIndex = params.length + 1;
+        }
+      }
+
+      if (clauses.length > 0) {
         whereClause = ` WHERE ${clauses.join(" AND ")}`;
       }
 
@@ -1908,20 +1947,73 @@ export class DrizzleAdapter implements DatabaseAdapterType {
   ): SQL | undefined {
     if (!options) return undefined;
 
-    if (options.filters && options.filters.length > 0) {
+    const allClauses: SQL[] = [];
+
+    if (options.orFilters && options.orFilters.length > 0) {
+      const orGroups: SQL[] = [];
+      for (const group of options.orFilters) {
+        if (group.length === 0) continue;
+        const clauses = group
+          .map((f) => this.buildWhereClause(f, table))
+          .filter((c): c is SQL => c !== undefined);
+        if (clauses.length === 0) continue;
+        if (clauses.length === 1) orGroups.push(clauses[0]);
+        else orGroups.push(and(...clauses) as SQL);
+      }
+      if (orGroups.length === 1) allClauses.push(orGroups[0]);
+      else if (orGroups.length > 1) allClauses.push(or(...orGroups) as SQL);
+    } else if (options.filters && options.filters.length > 0) {
       const clauses = options.filters
         .map((f) => this.buildWhereClause(f, table))
         .filter((c): c is SQL => c !== undefined);
-      if (clauses.length === 0) return undefined;
-      if (clauses.length === 1) return clauses[0];
-      return and(...clauses);
+      if (clauses.length > 0) {
+        if (clauses.length === 1) allClauses.push(clauses[0]);
+        else allClauses.push(and(...clauses) as SQL);
+      }
+    } else if (options.filter) {
+      const clause = this.buildWhereClause(options.filter, table);
+      if (clause) allClauses.push(clause);
     }
 
-    if (options.filter) {
-      return this.buildWhereClause(options.filter, table);
+    if (options.rawConditions && options.rawConditions.length > 0) {
+      for (const rc of options.rawConditions) {
+        if (!rc.clause) continue;
+        const clause = this.buildRawConditionClause(rc);
+        if (clause) allClauses.push(clause);
+      }
     }
 
-    return undefined;
+    if (allClauses.length === 0) return undefined;
+    if (allClauses.length === 1) return allClauses[0];
+    return and(...allClauses);
+  }
+
+  private buildRawConditionClause(rc: {
+    clause: string;
+    params: unknown[];
+  }): SQL {
+    if (rc.params.length === 0) {
+      return sql`${sql.raw(`(${rc.clause})`)}`;
+    }
+    const parts = rc.clause.split(/\$(\d+)/);
+    const fragments: SQL[] = [];
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 0) {
+        if (parts[i]) fragments.push(sql`${sql.raw(parts[i])}`);
+      } else {
+        const idx = parseInt(parts[i], 10) - 1;
+        if (idx >= 0 && idx < rc.params.length) {
+          fragments.push(sql`${rc.params[idx]}`);
+        }
+      }
+    }
+    if (fragments.length === 0) return sql`1=1`;
+    if (fragments.length === 1) return sql`(${fragments[0]})`;
+    let result = fragments[0];
+    for (let i = 1; i < fragments.length; i++) {
+      result = sql`${result}${fragments[i]}`;
+    }
+    return sql`(${result})`;
   }
 
   /**
@@ -2023,6 +2115,12 @@ export class DrizzleAdapter implements DatabaseAdapterType {
         },
       );
     }
+  }
+
+  private renumberRawClause(clause: string, startIndex: number): string {
+    return clause.replace(/\$(\d+)/g, (_match, num) => {
+      return `$${startIndex + parseInt(num, 10) - 1}`;
+    });
   }
 
   /**

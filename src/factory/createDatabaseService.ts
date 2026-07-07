@@ -420,7 +420,7 @@ export async function createDatabaseService(
     // STEP 5: Initialize Database Connection (with retry)
     // RESPONSIBILITY: Establish database connection and verify readiness.
     // Retries with exponential backoff for transient failures.
-    const initResult = await initializeWithRetry(baseAdapter);
+    const initResult = await initializeWithRetry(finalAdapter);
     if (!initResult.success) {
       throw new DatabaseError(
         `Failed to initialize adapter: ${initResult.error?.message ?? "Unknown error"}`,

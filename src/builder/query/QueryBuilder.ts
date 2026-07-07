@@ -1142,8 +1142,26 @@ export class QueryBuilder<TRecord extends object> {
     const options: QueryOptions<TRecord> = {};
 
     if (this._filters.length > 0) {
-      options.filter = this._filters[0];
-      options.filters = [...this._filters];
+      const hasOr = this._filters.some((f) => f.logical === "or");
+      if (hasOr) {
+        const groups: Filter<TRecord>[] = [];
+        const orGroups: Filter<TRecord>[][] = [];
+        for (const f of this._filters) {
+          if (f.logical === "or" && groups.length > 0) {
+            orGroups.push(groups.splice(0));
+          }
+          groups.push(f);
+        }
+        if (groups.length > 0) orGroups.push(groups);
+        options.orFilters = orGroups;
+      } else {
+        options.filter = this._filters[0];
+        options.filters = [...this._filters];
+      }
+    }
+
+    if (this._rawConditions.length > 0) {
+      options.rawConditions = this._rawConditions.map((rc) => ({ ...rc }));
     }
 
     if (this._sort.length > 0) {

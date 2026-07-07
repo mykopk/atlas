@@ -1,6 +1,6 @@
 {
   "name": "@myko.pk/atlas",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Universal secure database abstraction layer for the MYKO ecosystem — Drizzle, Prisma, SQL, Supabase, Mock with pluggable extensions",
   "type": "module",
   "license": "MIT",
@@ -70,7 +70,7 @@
     "@myko.pk/config": "^1.0.0",
     "@myko.pk/errors": "^1.0.0",
     "@myko.pk/logger": "^1.1.0",
-    "@myko.pk/types": "^1.0.0",
+    "@myko.pk/types": "^1.0.5",
     "@supabase/supabase-js": "^2.49.4",
     "drizzle-orm": "^0.44.6",
     "pg": "^8.13.3",
