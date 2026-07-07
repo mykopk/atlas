@@ -1598,7 +1598,7 @@ export class DrizzleAdapter implements DatabaseAdapterType {
    */
   async count<T extends object = object>(
     table: string,
-    filter?: Filter<T>,
+    filter?: Filter<T> | Filter<T>[],
   ): Promise<DatabaseResult<number>> {
     try {
       if (this.isStringMode(table)) {
@@ -1611,10 +1611,18 @@ export class DrizzleAdapter implements DatabaseAdapterType {
         .select({ count: sql<number>`count(*)::int` })
         .from(tableObj);
 
-      const query =
-        filter && this.buildWhereClause(filter, tableObj)
-          ? baseQuery.where(this.buildWhereClause(filter, tableObj) as SQL)
-          : baseQuery;
+      let whereClause: SQL | undefined;
+      if (Array.isArray(filter)) {
+        const clauses = filter
+          .map((f) => this.buildWhereClause(f, tableObj))
+          .filter((c): c is SQL => c !== undefined);
+        if (clauses.length === 1) whereClause = clauses[0];
+        else if (clauses.length > 1) whereClause = and(...clauses);
+      } else if (filter) {
+        whereClause = this.buildWhereClause(filter, tableObj);
+      }
+
+      const query = whereClause ? baseQuery.where(whereClause) : baseQuery;
 
       const result = await query;
       const countValue = result.length > 0 ? result[0].count : 0;
@@ -1655,7 +1663,7 @@ export class DrizzleAdapter implements DatabaseAdapterType {
    */
   private async countRawSql<T extends object>(
     table: string,
-    filter?: Filter<T>,
+    filter?: Filter<T> | Filter<T>[],
   ): Promise<DatabaseResult<number>> {
     try {
       const tableName = this.getStringTableName(table);
@@ -1663,14 +1671,21 @@ export class DrizzleAdapter implements DatabaseAdapterType {
       let whereClause = "";
 
       if (filter) {
-        const { field, operator, value } = filter;
-        whereClause = this.buildSqlWhereClause({
-          field,
-          operator,
-          value,
-          params,
-          startIndex: 1,
-        });
+        const filters = Array.isArray(filter) ? filter : [filter];
+        const clauses: string[] = [];
+        for (const f of filters) {
+          const clause = this.buildSqlWhereClause({
+            field: f.field,
+            operator: f.operator,
+            value: f.value,
+            params,
+            startIndex: params.length + 1,
+          });
+          if (clause) clauses.push(clause);
+        }
+        if (clauses.length > 0) {
+          whereClause = " WHERE " + clauses.join(" AND ");
+        }
       }
 
       const sqlQuery = `SELECT COUNT(*) as count FROM "${tableName}"${whereClause}`;
