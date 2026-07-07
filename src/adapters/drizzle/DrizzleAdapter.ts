@@ -803,11 +803,15 @@ export class DrizzleAdapter implements DatabaseAdapterType {
         break;
       case "in":
         if (Array.isArray(value)) {
-          const placeholders = value
-            .map((_, i) => `$${startIndex + i}`)
-            .join(", ");
-          clause = ` WHERE "${field}" IN (${placeholders})`;
-          params.push(...value);
+          if (value.length === 0) {
+            clause = " WHERE 1=0";
+          } else {
+            const placeholders = value
+              .map((_, i) => `$${startIndex + i}`)
+              .join(", ");
+            clause = ` WHERE "${field}" IN (${placeholders})`;
+            params.push(...value);
+          }
         }
         break;
       case "like":
@@ -1978,8 +1982,14 @@ export class DrizzleAdapter implements DatabaseAdapterType {
         case "lte":
           return lte(column, value);
         case "in":
+          if (Array.isArray(value) && value.length === 0) {
+            return sql`1=0`;
+          }
           return inArray(column, value as unknown[]);
         case "notIn":
+          if (Array.isArray(value) && value.length === 0) {
+            return sql`1=1`;
+          }
           return not(inArray(column, value as unknown[]));
         case "like":
           return like(column, value as string);
