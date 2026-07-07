@@ -163,13 +163,21 @@ function createAdapterConfig(config: DatabaseServiceConfig): DatabaseConfig {
   // Drizzle Adapter Config - PostgreSQL with Drizzle ORM
   if (config.adapter === ADAPTER_TYPES.DRIZZLE) {
     const drizzleConfig = config.config as DrizzleConfig;
+    const userPool = drizzleConfig.pool;
+    const pool = userPool
+      ? {
+          max: userPool.max,
+          min: userPool.min,
+          idleTimeoutMillis: userPool.idleTimeoutMs,
+          connectionTimeoutMillis: userPool.acquireTimeoutMs,
+        }
+      : (drizzleConfig.poolSize ? { max: drizzleConfig.poolSize } : undefined);
     return {
       adapter: ADAPTERS.DRIZZLE,
       connectionString: drizzleConfig.connectionString ?? drizzleConfig.url,
-      pool: drizzleConfig.poolSize
-        ? { max: drizzleConfig.poolSize }
-        : undefined,
+      pool,
       tableIdColumns: drizzleConfig.tableIdColumns,
+      logging: drizzleConfig.logging,
     };
   }
 
@@ -246,6 +254,36 @@ function validateConfig(config: DatabaseServiceConfig): void {
       },
     );
   }
+}
+
+/**
+ * INITIALIZE WITH RETRY - Exponential backoff for transient DB failures
+ *
+ * **RESPONSIBILITY:** Retries adapter initialization on failure with exponential backoff.
+ * Handles transient issues like DB restarts, network glitches, or pool exhaustion.
+ *
+ * @param adapter - The database adapter to initialize
+ * @param maxRetries - Maximum number of retry attempts (default: 3)
+ * @param baseDelayMs - Initial delay between retries in ms (default: 1000)
+ * @returns A DatabaseResult indicating success or the last failure
+ */
+async function initializeWithRetry(
+  adapter: DatabaseAdapterType,
+  maxRetries = 3,
+  baseDelayMs = 1000,
+): Promise<{ success: boolean; error?: Error }> {
+  let lastError: Error | undefined;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const result = await adapter.initialize();
+    if (result.success) return { success: true };
+
+    lastError = result.error ?? new Error("Unknown initialization error");
+    if (attempt < maxRetries) {
+      const delay = Math.min(baseDelayMs * 2 ** attempt, 10_000);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  return { success: false, error: lastError };
 }
 
 /**
@@ -379,9 +417,10 @@ export async function createDatabaseService(
       eventHandlers: config.events, // Event handlers for notifications
     });
 
-    // STEP 5: Initialize Database Connection
-    // RESPONSIBILITY: Establish database connection and verify readiness
-    const initResult = await baseAdapter.initialize();
+    // STEP 5: Initialize Database Connection (with retry)
+    // RESPONSIBILITY: Establish database connection and verify readiness.
+    // Retries with exponential backoff for transient failures.
+    const initResult = await initializeWithRetry(baseAdapter);
     if (!initResult.success) {
       throw new DatabaseError(
         `Failed to initialize adapter: ${initResult.error?.message ?? "Unknown error"}`,

@@ -49,6 +49,9 @@ export { ReadReplicaAdapter } from "./extensions/ReadReplicaAdapter";
 export { MultiWriteAdapter } from "./extensions/MultiWriteExtension";
 export { MultiReadAdapter } from "./extensions/MultiReadExtension";
 
+export { CircuitBreaker, CircuitState, CircuitBreakerError, withDbCircuitBreaker } from "./extensions/CircuitBreakerExtension";
+export type { CircuitBreakerConfig, CircuitBreakerMetrics } from "./extensions/CircuitBreakerExtension";
+
 // Utility exports
 export { ConfigMerger } from "./utils/ConfigMerger";
 export { escapeIlike } from "./utils/sql";

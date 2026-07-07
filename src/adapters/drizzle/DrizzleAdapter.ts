@@ -1,4 +1,5 @@
 import { drizzle } from "drizzle-orm/node-postgres";
+import { DefaultLogger } from "drizzle-orm";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 import type {
@@ -39,6 +40,8 @@ import type {
   Filter,
   Transaction,
   SortOptions,
+  FindFirstOptions,
+  PoolMetrics,
 } from "@myko.pk/types/db";
 import { failure, success } from "@utils/databaseResultHelpers";
 import { DatabaseError } from "@myko.pk/errors";
@@ -100,7 +103,9 @@ export class DrizzleAdapter implements DatabaseAdapterType {
       connectionString: config.connectionString,
       ...config.pool,
     });
-    this.db = drizzle(this.pool);
+    this.db = drizzle(this.pool, {
+      logger: config.logging ? new DefaultLogger() : false,
+    });
     this.configIdColumns = config.tableIdColumns ?? {};
   }
 
@@ -226,6 +231,29 @@ export class DrizzleAdapter implements DatabaseAdapterType {
    */
   getClient<TClient extends object = object>(): TClient {
     return this.db as TClient;
+  }
+
+  /**
+   * Get connection pool metrics for observability.
+   *
+   * @description
+   * Returns pool utilization data from the underlying pg.Pool.
+   * Used by Prometheus metrics and health checks.
+   *
+   * @returns PoolMetrics object or null if pool is not available
+   */
+  getPoolMetrics(): PoolMetrics | null {
+    if (!this.pool) return null;
+    const active = this.pool.totalCount - this.pool.idleCount;
+    return {
+      totalConnections: this.pool.totalCount,
+      idleConnections: this.pool.idleCount,
+      activeConnections: Math.max(0, active),
+      waitingRequests: this.pool.waitingCount,
+      totalAcquired: 0,
+      totalReleased: 0,
+      averageAcquisitionTime: 0,
+    };
   }
 
   /**
@@ -523,6 +551,112 @@ export class DrizzleAdapter implements DatabaseAdapterType {
             context: {
               source: "DrizzleAdapter.findMany",
             },
+            cause: error as Error,
+          },
+        ),
+      );
+    }
+  }
+
+  /**
+   * Find the first record matching advanced options.
+   *
+   * @description
+   * Converts FindFirstOptions to a QueryOptions-compatible filter array and
+   * delegates to findMany with limit 1. In string mode uses raw SQL with
+   * a parameterised WHERE clause.
+   *
+   * @template T - The expected record type
+   * @param table - Logical or physical table name
+   * @param options - FindFirst options (where, select, include)
+   * @returns A DatabaseResult containing the first matching record or null
+   */
+  async findFirst<T extends object>(
+    table: string,
+    options?: FindFirstOptions<T>,
+  ): Promise<DatabaseResult<T | null>> {
+    try {
+      const filters: Filter<T>[] = [];
+
+      if (options?.where) {
+        for (const [field, value] of Object.entries(options.where)) {
+          if (value !== undefined && value !== null && typeof value === "object") {
+            for (const [op, val] of Object.entries(value as Record<string, unknown>)) {
+              if (["gt", "gte", "lt", "lte", "eq", "ne"].includes(op)) {
+                filters.push({ field, operator: op, value: val } as unknown as Filter<T>);
+              }
+            }
+          } else {
+            filters.push({ field, operator: "eq", value } as unknown as Filter<T>);
+          }
+        }
+      }
+
+      const manyResult = await this.findMany<T>(table, {
+        filters: filters.length > 0 ? filters : undefined,
+        pagination: { limit: 1, offset: 0 },
+      });
+
+      if (!manyResult.success) {
+        return { success: false, value: null, error: manyResult.error };
+      }
+
+      return {
+        success: true,
+        value: manyResult.value?.data[0] ?? null,
+        error: manyResult.error,
+      };
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.message === "USE_STRING_MODE"
+      ) {
+        const whereClauses: string[] = [];
+        const params: unknown[] = [];
+        let paramIndex = 0;
+        const tableName = this.getStringTableName(table);
+
+        if (options?.where) {
+          for (const [field, value] of Object.entries(options.where)) {
+            if (value !== undefined && value !== null && typeof value === "object") {
+              for (const [op, val] of Object.entries(value as Record<string, unknown>)) {
+                paramIndex++;
+                let opSql: string;
+                switch (op) {
+                  case "gt": opSql = ">"; break;
+                  case "gte": opSql = ">="; break;
+                  case "lt": opSql = "<"; break;
+                  case "lte": opSql = "<="; break;
+                  case "eq": opSql = "="; break;
+                  case "ne": opSql = "!="; break;
+                  default: continue;
+                }
+                whereClauses.push(`"${field}" ${opSql} $${paramIndex}`);
+                params.push(val);
+              }
+            } else {
+              paramIndex++;
+              whereClauses.push(`"${field}" = $${paramIndex}`);
+              params.push(value);
+            }
+          }
+        }
+
+        const whereClause = whereClauses.length > 0
+          ? ` WHERE ${whereClauses.join(" AND ")}`
+          : "";
+
+        const sqlQuery = `SELECT * FROM "${tableName}"${whereClause} LIMIT 1`;
+        const result = await this.pool.query(sqlQuery, params);
+        return success(result.rows[0] ?? null);
+      }
+
+      return failure(
+        new DatabaseError(
+          `Failed to find first in table ${table}: ${(error as Error).message}`,
+          DATABASE_ERROR_CODES.QUERY_FAILED,
+          {
+            context: { source: "DrizzleAdapter.findFirst" },
             cause: error as Error,
           },
         ),
@@ -963,6 +1097,239 @@ export class DrizzleAdapter implements DatabaseAdapterType {
             context: {
               source: "DrizzleAdapter.deleteRawSql",
             },
+            cause: error as Error,
+          },
+        ),
+      );
+    }
+  }
+
+  /**
+   * Update multiple records matching a condition.
+   *
+   * @description
+   * In typed mode uses Drizzle's update builder with AND-combined WHERE
+   * conditions from the `where` object. In string mode builds a parameterised
+   * UPDATE SQL statement. Supports USE_STRING_MODE fallback.
+   *
+   * @param table - Logical or physical table name
+   * @param where - Conditions to match records (plain object of field-value pairs, AND-combined)
+   * @param data - The data to apply to matching records
+   * @returns A DatabaseResult containing the number of affected rows
+   */
+  async updateMany(
+    table: string,
+    where: Record<string, any>,
+    data: Record<string, any>,
+  ): Promise<DatabaseResult<number>> {
+    try {
+      if (this.isStringMode(table)) {
+        const stringTable = this.getStringTableName(table);
+        const keys = Object.keys(data);
+        const setClause = keys.map((k, i) => `"${k}" = $${i + 1}`).join(", ");
+        const whereKeys = Object.keys(where);
+        const whereClause = whereKeys
+          .map((k, i) => `"${k}" = $${keys.length + i + 1}`)
+          .join(" AND ");
+        const sqlQuery = `UPDATE "${stringTable}" SET ${setClause} WHERE ${whereClause}`;
+        const result = await this.pool.query(sqlQuery, [
+          ...Object.values(data),
+          ...Object.values(where),
+        ]);
+        return success(result.rowCount ?? 0);
+      }
+      const tableObj = this.getTable(table);
+      const whereConditions = Object.entries(where).map(([field, value]) => {
+        const column = tableObj[field as keyof typeof tableObj] as PgColumn;
+        return eq(column, value);
+      });
+      const combinedWhere =
+        whereConditions.length === 1
+          ? whereConditions[0]
+          : and(...whereConditions);
+      const result = await this.db
+        .update(tableObj)
+        .set(data)
+        .where(combinedWhere);
+      return success(result.rowCount ?? 0);
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.message === "USE_STRING_MODE"
+      ) {
+        const stringTable = this.getStringTableName(table);
+        const keys = Object.keys(data);
+        const setClause = keys.map((k, i) => `"${k}" = $${i + 1}`).join(", ");
+        const whereKeys = Object.keys(where);
+        const whereClause = whereKeys
+          .map((k, i) => `"${k}" = $${keys.length + i + 1}`)
+          .join(" AND ");
+        const sqlQuery = `UPDATE "${stringTable}" SET ${setClause} WHERE ${whereClause}`;
+        const result = await this.pool.query(sqlQuery, [
+          ...Object.values(data),
+          ...Object.values(where),
+        ]);
+        return success(result.rowCount ?? 0);
+      }
+      return failure(
+        new DatabaseError(
+          `Failed to update many in table ${table}: ${(error as Error).message}`,
+          DATABASE_ERROR_CODES.UPDATE_FAILED,
+          {
+            context: { source: "DrizzleAdapter.updateMany" },
+            cause: error as Error,
+          },
+        ),
+      );
+    }
+  }
+
+  /**
+   * Delete multiple records matching a condition.
+   *
+   * @description
+   * In typed mode uses Drizzle's delete builder with AND-combined WHERE
+   * conditions. In string mode builds a parameterised DELETE SQL statement.
+   * Supports USE_STRING_MODE fallback.
+   *
+   * @param table - Logical or physical table name
+   * @param where - Conditions to match records (plain object of field-value pairs, AND-combined)
+   * @returns A DatabaseResult containing the number of affected rows
+   */
+  async deleteMany(
+    table: string,
+    where: Record<string, any>,
+  ): Promise<DatabaseResult<number>> {
+    try {
+      if (this.isStringMode(table)) {
+        const stringTable = this.getStringTableName(table);
+        const whereKeys = Object.keys(where);
+        const whereClause = whereKeys
+          .map((k, i) => `"${k}" = $${i + 1}`)
+          .join(" AND ");
+        const sqlQuery = `DELETE FROM "${stringTable}" WHERE ${whereClause}`;
+        const result = await this.pool.query(
+          sqlQuery,
+          Object.values(where),
+        );
+        return success(result.rowCount ?? 0);
+      }
+      const tableObj = this.getTable(table);
+      const whereConditions = Object.entries(where).map(([field, value]) => {
+        const column = tableObj[field as keyof typeof tableObj] as PgColumn;
+        return eq(column, value);
+      });
+      const combinedWhere =
+        whereConditions.length === 1
+          ? whereConditions[0]
+          : and(...whereConditions);
+      const result = await this.db.delete(tableObj).where(combinedWhere);
+      return success(result.rowCount ?? 0);
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.message === "USE_STRING_MODE"
+      ) {
+        const stringTable = this.getStringTableName(table);
+        const whereKeys = Object.keys(where);
+        const whereClause = whereKeys
+          .map((k, i) => `"${k}" = $${i + 1}`)
+          .join(" AND ");
+        const sqlQuery = `DELETE FROM "${stringTable}" WHERE ${whereClause}`;
+        const result = await this.pool.query(
+          sqlQuery,
+          Object.values(where),
+        );
+        return success(result.rowCount ?? 0);
+      }
+      return failure(
+        new DatabaseError(
+          `Failed to delete many from table ${table}: ${(error as Error).message}`,
+          DATABASE_ERROR_CODES.DELETE_FAILED,
+          {
+            context: { source: "DrizzleAdapter.deleteMany" },
+            cause: error as Error,
+          },
+        ),
+      );
+    }
+  }
+
+  /**
+   * Insert a record or update it if it already exists (upsert).
+   *
+   * @description
+   * In typed mode uses Drizzle's onConflictDoUpdate. In string mode builds a
+   * parameterised INSERT ... ON CONFLICT DO UPDATE SET ... RETURNING * query.
+   * The first key of the `where` object is used as the conflict target column.
+   * Supports USE_STRING_MODE fallback.
+   *
+   * @template T - The expected record type
+   * @param table - Logical or physical table name
+   * @param where - Condition to detect existing records (first key = conflict column)
+   * @param create - Data for creating a new record
+   * @param update - Data for updating an existing record
+   * @returns A DatabaseResult containing the upserted record
+   */
+  async upsert<T>(
+    table: string,
+    where: Record<string, any>,
+    create: Record<string, any>,
+    update: Record<string, any>,
+  ): Promise<DatabaseResult<T>> {
+    try {
+      if (this.isStringMode(table)) {
+        const stringTable = this.getStringTableName(table);
+        const keys = Object.keys(create);
+        const columns = keys.map((k) => `"${k}"`).join(", ");
+        const placeholders = keys.map((_, i) => `$${i + 1}`).join(", ");
+        const updateSet = Object.keys(update)
+          .map((k, i) => `"${k}" = $${keys.length + i + 1}`)
+          .join(", ");
+        const conflictCol = Object.keys(where)[0] ?? "id";
+        const sqlQuery = `INSERT INTO "${stringTable}" (${columns}) VALUES (${placeholders}) ON CONFLICT ("${conflictCol}") DO UPDATE SET ${updateSet} RETURNING *`;
+        const result = await this.pool.query(sqlQuery, [
+          ...Object.values(create),
+          ...Object.values(update),
+        ]);
+        return success(result.rows[0] as T);
+      }
+      const tableObj = this.getTable(table);
+      const conflictColName = Object.keys(where)[0] ?? "id";
+      const conflictColumn =
+        tableObj[conflictColName as keyof typeof tableObj] as PgColumn;
+      const result = await this.db
+        .insert(tableObj)
+        .values(create)
+        .onConflictDoUpdate({ target: conflictColumn, set: update })
+        .returning();
+      return success(result[0] as T);
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.message === "USE_STRING_MODE"
+      ) {
+        const stringTable = this.getStringTableName(table);
+        const keys = Object.keys(create);
+        const columns = keys.map((k) => `"${k}"`).join(", ");
+        const placeholders = keys.map((_, i) => `$${i + 1}`).join(", ");
+        const updateSet = Object.keys(update)
+          .map((k, i) => `"${k}" = $${keys.length + i + 1}`)
+          .join(", ");
+        const conflictCol = Object.keys(where)[0] ?? "id";
+        const sqlQuery = `INSERT INTO "${stringTable}" (${columns}) VALUES (${placeholders}) ON CONFLICT ("${conflictCol}") DO UPDATE SET ${updateSet} RETURNING *`;
+        const result = await this.pool.query(sqlQuery, [
+          ...Object.values(create),
+          ...Object.values(update),
+        ]);
+        return success(result.rows[0] as T);
+      }
+      return failure(
+        new DatabaseError(
+          `Failed to upsert in table ${table}: ${(error as Error).message}`,
+          DATABASE_ERROR_CODES.UPDATE_FAILED,
+          {
+            context: { source: "DrizzleAdapter.upsert" },
             cause: error as Error,
           },
         ),

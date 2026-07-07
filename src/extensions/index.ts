@@ -88,3 +88,7 @@ export { MultiWriteAdapter } from "./MultiWriteExtension";
 
 /** Read distribution across multiple read replicas with load balancing */
 export { MultiReadAdapter } from "./MultiReadExtension";
+
+/** Circuit breaker for database resilience with P99 latency tracking */
+export { CircuitBreaker, CircuitState, CircuitBreakerError, withDbCircuitBreaker } from "./CircuitBreakerExtension";
+export type { CircuitBreakerConfig, CircuitBreakerMetrics } from "./CircuitBreakerExtension";

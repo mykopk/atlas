@@ -1,7 +1,7 @@
 {
   "name": "@myko.pk/atlas",
-  "version": "2.0.2",
-  "description": "Universal secure database abstraction layer for the MYKO ecosystem \u2014 Drizzle, Prisma, SQL, Supabase, Mock with pluggable extensions",
+  "version": "2.2.0",
+  "description": "Universal secure database abstraction layer for the MYKO ecosystem — Drizzle, Prisma, SQL, Supabase, Mock with pluggable extensions",
   "type": "module",
   "license": "MIT",
   "author": "MYKO Pakistan",
